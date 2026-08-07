@@ -1,0 +1,18 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Secrets & local FLE state
+.env
+.fle/
+
+# Editor / OS
+.DS_Store
+*.eval
