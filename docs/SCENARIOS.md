@@ -48,23 +48,17 @@ See `examples/03_scripted_miner.py`.
 - Persist `info["output_game_state"]` if you need restore/resume later.
 - Failures in Lua/Python show up in `raw_text` — treat them as observations, not process crashes.
 
-## Pattern B — LLM / DSPy agent
+## Pattern B — Intro LLM / DSPy agent
 
 ```text
-bootstrap inventory+iron  →  DSPy FactorioProgrammer (+ demos)  →  Python program  →  env.step
+bootstrap inventory+iron  →  build_agent()  →  Python program  →  env.step
 ```
 
-See `examples/04_dspy_agent_loop.py`. `build_agent()` attaches labeled FLE demos so the model does not invent string APIs.
+See `examples/04_dspy_agent_loop.py`. Baseline only — no teleprompting, no `--load`.
 
-Design knobs:
+Design knobs: `--steps`, model, observation truncation, `API_HINT`.
 
-| Knob | Effect |
-|------|--------|
-| `--steps` | Trajectory length |
-| model (`gpt-4o-mini` vs stronger) | Plan quality / cost |
-| observation truncation | Context size vs detail |
-| `API_HINT` / inventory hints | Steer enums + `move_to` |
-| `SEED_DEMOS` | Few-shot tool-use patterns |
+For compiled GEPA agents use `07` (train) + `08` (run) — [GEPA_STARTER.md](GEPA_STARTER.md).
 
 ## Pattern C — Official inspect-eval harness
 

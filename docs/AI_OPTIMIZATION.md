@@ -2,42 +2,44 @@
 
 This repo uses **DSPy** as the AI layer on top of FLE's code-as-action interface.
 
+Keep **intro**, **train**, and **run** concerns separate:
+
+| Concern | Entry point | What it does |
+|---------|-------------|--------------|
+| **Intro runtime** | `examples/04_dspy_agent_loop.py` | Baseline `Predict` in Factorio (learning the loop) |
+| **Bootstrap train** | `examples/05_optimize_agent.py` | Offline BootstrapFewShot → save JSON |
+| **GEPA train** | `examples/07_gepa_train.py` | Offline GEPA → save JSON — [GEPA_STARTER.md](GEPA_STARTER.md) |
+| **GEPA run** | `examples/08_gepa_run.py` | Load GEPA artifact → short Factorio rollout |
+
+Train scripts never step Factorio. Run/intro scripts never call `compile()` / teleprompters.
+
 ## Architecture
 
 ```text
-┌──────────────────┐     program (Python)     ┌────────────────────┐
-│  DSPy module     │ ───────────────────────► │  FLE gym env       │
-│  FactorioProgrammer │                         │  Factorio + tools  │
-└────────▲─────────┘     raw_text / reward    └─────────┬──────────┘
-         │                                              │
-         └──────────────── observation ─────────────────┘
+Intro (04)     build_agent() ──────────────────► Factorio
+
+Train (05/07)  TRAIN/VAL demos + optimizer ──save──► .fle/*.json
+                                                      │
+Run (08)       load_agent(path) ◄─────────────────────┘ ──► Factorio
 ```
 
 Core pieces:
 
-- `factorio_gym/agent.py` — `FactorioProgrammer` signature, `SEED_DEMOS`, `API_HINT`, helpers
-- `examples/04_dspy_agent_loop.py` — online REPL loop (bootstrap + few-shot agent)
-- `examples/05_optimize_agent.py` — offline prompt optimization over the same demos
+- `factorio_gym/agent.py` — signature, `build_agent`, `load_agent`, `propose_program`
+- `factorio_gym/trainset.py` — `TRAIN_DEMOS` / `VAL_DEMOS` (train only)
+- `examples/04_…` — intro agent
+- `examples/05_…` — BootstrapFewShot train
+- `examples/07_…` / `08_…` — GEPA train / run — [GEPA_STARTER.md](GEPA_STARTER.md)
 
-## Why the agent needs demos
+## Intro runtime (example 04)
 
-Unprompted LLMs invent string APIs (`nearest("iron-ore")`) that crash in FLE. This repo fixes that by:
+```bash
+uv run python examples/04_dspy_agent_loop.py --steps 5 --model openai/gpt-4o-mini
+```
 
-1. Hard API rules in the `FactorioProgrammer` docstring (`Resource.*` / `Prototype.*` / `move_to`)
-2. `LabeledFewShot` over `SEED_DEMOS` in `build_agent()`
-3. A bootstrap REPL step that prints inventory + nearest iron before the LLM acts
-4. Passing `API_HINT` every step
+Flow: bootstrap inventory + iron → `propose_program` → `step_code`. Uses signature + `API_HINT` only (no compiled demos).
 
-Without those, `04` loops the same AttributeError forever.
-
-## What to optimize
-
-1. **Prompt / demos** (cheapest) — expand `SEED_DEMOS` / BootstrapFewShot / GEPA  
-2. **Model choice** — mini for iteration, stronger models for hard throughput tasks  
-3. **Trajectory policy** — step budget, early stop, observation trimming  
-4. **Tool curriculum** — start with mining → smelting → belts → science  
-
-## Offline optimization (no Factorio)
+## Bootstrap train (example 05)
 
 ```bash
 uv run python examples/05_optimize_agent.py \
@@ -45,80 +47,30 @@ uv run python examples/05_optimize_agent.py \
   --save .fle/optimized_factorio_agent.json
 ```
 
-How it works:
+Saves a compiled module. To roll it out, mirror `08_gepa_run.py` (swap the `--program` path) rather than overloading example 04.
 
-1. Reuses `SEED_DEMOS` from `factorio_gym.agent` as the trainset  
-2. `BootstrapFewShot` asks the LM to produce programs and keeps ones that pass `program_metric`  
-3. Saves a compiled DSPy module you can `--load` in example 04  
+For reflective optimization with textual feedback, prefer GEPA: [GEPA_STARTER.md](GEPA_STARTER.md).
 
-**Metric.** The starter metric rewards `print` + FLE tools + `Resource.`/`Prototype.` enums, and penalizes stringly `nearest("...")`. Better metrics:
+## What to optimize
 
-- Unit-test style: AST parse success
-- Execution success rate on a frozen Factorio seed (online metric)
-- Quota progress / production score after N steps
-
-## Online loop
-
-```bash
-uv run python examples/04_dspy_agent_loop.py --steps 8 --model openai/gpt-4o-mini
-```
-
-Flow:
-
-1. `reset` → bootstrap (`inspect_inventory` + `nearest(Resource.IronOre)`)
-2. Each step: `propose_program(goal, observation, API_HINT)` → `step_code`
-3. Observation text (including exceptions) feeds the next step
-
-Optimization ideas while online:
-
-| Idea | Why |
-|------|-----|
-| Truncate `raw_text` to last 2–4k chars | Avoid context blowups |
-| Force a JSON plan then code | Separates reasoning from syntax |
-| Retry once on parse/tool errors | Cheap robustness |
-| Cache successful subroutines | Drill placement, fuel insert, belt lines |
-| Expand `SEED_DEMOS` with chest/belt steps | Stops re-placing drills on occupied tiles |
-
-## Loading an optimized module
-
-```bash
-uv run python examples/04_dspy_agent_loop.py \
-  --load .fle/optimized_factorio_agent.json \
-  --steps 8
-```
-
-Or in code:
-
-```python
-import dspy
-from factorio_gym.agent import FactorioProgrammer, build_lm, AgentConfig
-
-dspy.configure(lm=build_lm(AgentConfig()))
-agent = dspy.Predict(FactorioProgrammer)
-agent.load(".fle/optimized_factorio_agent.json")
-```
+1. **Prompt / demos** — expand `TRAIN_DEMOS` / BootstrapFewShot / GEPA  
+2. **Model choice** — mini for iteration, stronger models for hard tasks  
+3. **Trajectory policy** — step budget, early stop, observation trimming  
+4. **Tool curriculum** — mining → smelting → belts → science  
 
 ## inspect-eval vs custom loop
 
 | | Custom DSPy loop | `fle inspect-eval` |
 |--|------------------|--------------------|
-| Flexibility | High (your metrics, logging) | Medium |
-| Comparability | Low | High (harness + scorers) |
-| Container needs | 1 | 1 per epoch if Pass@N |
+| Flexibility | High | Medium |
+| Comparability | Low | High |
 | Best for | Prompt/engine R&D | Benchmark numbers |
 
-Recommended: iterate in examples 03→05→04, then measure with example 06.
-
-## Cost / latency knobs
-
-- `--trajectory-length` / `--steps` dominate cost  
-- Prefer `gpt-4o-mini` while debugging tool use  
-- Pin `--epochs 1` until you run a multi-instance cluster (`fle cluster start -n 8`)  
-- Set `temperature=0.2` (default in `AgentConfig`) for more stable code  
+Recommended path: scripted `03` → intro `04` → GEPA train `07` → GEPA run `08` → measure with `06`.
 
 ## Next upgrades
 
-1. Replace `program_metric` with an execution metric that runs programs in FLE  
-2. Add GEPA (`dspy.GEPA`) once you have a reliable metric  
-3. Store trajectories as DSPy examples automatically from `04_dspy_agent_loop.py`  
+1. Execution metric that runs programs in FLE (still `score` + `feedback` for GEPA)  
+2. `dspy.BetterTogether` (Bootstrap → GEPA) once the metric is solid  
+3. Store successful `04` / `08` trajectories into `trainset`  
 4. Multi-module pipeline: Planner → Coder → Critic  

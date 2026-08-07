@@ -30,7 +30,8 @@ uv run python examples/01_hello_world.py
 | [docs/SETUP.md](docs/SETUP.md) | Install, cluster, env vars, Apple Silicon notes |
 | [docs/HELLO_WORLD.md](docs/HELLO_WORLD.md) | First working program end-to-end |
 | [docs/SCENARIOS.md](docs/SCENARIOS.md) | Building scripted + LLM scenarios |
-| [docs/AI_OPTIMIZATION.md](docs/AI_OPTIMIZATION.md) | DSPy agent loop + prompt optimization |
+| [docs/AI_OPTIMIZATION.md](docs/AI_OPTIMIZATION.md) | DSPy runtime vs optimization tracks |
+| [docs/GEPA_STARTER.md](docs/GEPA_STARTER.md) | Minimal GEPA optimize → load flow |
 | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Docker / RCON / eval pitfalls we hit |
 
 ## Examples
@@ -40,9 +41,11 @@ uv run python examples/01_hello_world.py
 | `examples/01_hello_world.py` | Connect + `nearest(Resource.IronOre)` |
 | `examples/02_list_environments.py` | List FLE task IDs |
 | `examples/03_scripted_miner.py` | Deterministic multi-step scenario |
-| `examples/04_dspy_agent_loop.py` | LLM agent with FLE API demos + bootstrap |
-| `examples/05_optimize_agent.py` | BootstrapFewShot over shared `SEED_DEMOS` |
+| `examples/04_dspy_agent_loop.py` | Intro DSPy agent loop (baseline Predict) |
+| `examples/05_optimize_agent.py` | Offline BootstrapFewShot train |
 | `examples/06_run_inspect_eval.py` | Thin wrapper for `fle inspect-eval` |
+| `examples/07_gepa_train.py` | Offline GEPA train → save module |
+| `examples/08_gepa_run.py` | Run a GEPA-compiled module in Factorio |
 
 ## Important 0.4.x differences from upstream quickstart
 
@@ -66,8 +69,8 @@ uv run fle inspect-eval \
 ## Project layout
 
 ```
-factorio_gym/          # shared helpers (env + DSPy agent)
-examples/              # runnable tutorials
+factorio_gym/          # env + agent + offline trainset
+examples/              # 04=intro agent, 07/08=GEPA train/run
 docs/                  # setup + tutorials
 .env                   # secrets (gitignored)
 ```
