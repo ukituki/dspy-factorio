@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Optimize a Factorio code-gen prompt with DSPy BootstrapFewShot.
+"""BootstrapFewShot train: compile a FactorioProgrammer offline (no Factorio).
 
-This does **not** need Factorio running. It optimizes the DSPy signature against
-a small offline dataset of (goal, observation) → program examples. Use the
-optimized module later inside `04_dspy_agent_loop.py`.
+Train-only. For a reflective optimizer with a matching run script, see
+``examples/07_gepa_train.py`` + ``examples/08_gepa_run.py``.
 
 Usage:
     uv run python examples/05_optimize_agent.py
@@ -25,13 +24,11 @@ from dspy.teleprompt import BootstrapFewShot
 from factorio_gym.agent import (
     AgentConfig,
     FactorioProgrammer,
-    SEED_DEMOS,
     build_lm,
     strip_code_fences,
 )
 from factorio_gym.env import load_project_env
-
-TRAINSET = SEED_DEMOS
+from factorio_gym.trainset import TRAIN_DEMOS as SEED_DEMOS
 
 
 def program_metric(example, pred, trace=None) -> float:
@@ -72,11 +69,10 @@ def main() -> int:
         max_bootstrapped_demos=args.max_bootstrapped_demos,
         max_labeled_demos=args.max_labeled_demos,
     )
-    print(f"Optimizing with {len(TRAINSET)} examples on {args.model}...")
-    compiled = optimizer.compile(student, trainset=TRAINSET)
+    print(f"Optimizing with {len(SEED_DEMOS)} examples on {args.model}...")
+    compiled = optimizer.compile(student, trainset=SEED_DEMOS)
 
-    # Quick smoke evaluate
-    sample = TRAINSET[0]
+    sample = SEED_DEMOS[0]
     pred = compiled(
         goal=sample.goal,
         observation=sample.observation,
@@ -91,12 +87,13 @@ def main() -> int:
     compiled.save(str(save_path))
     meta = {
         "model": args.model,
-        "train_size": len(TRAINSET),
+        "train_size": len(SEED_DEMOS),
         "metric": "program_metric",
         "path": str(save_path),
     }
     save_path.with_suffix(".meta.json").write_text(json.dumps(meta, indent=2))
-    print(f"\nSaved optimized module → {save_path}")
+    print(f"\nSaved compiled module → {save_path}")
+    print("To roll out, mirror examples/08_gepa_run.py with --program", save_path)
     return 0
 
 

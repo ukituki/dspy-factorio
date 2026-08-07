@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""LLM agent loop: observation → DSPy program → Factorio step.
+"""Intro: DSPy agent loop (baseline Predict → Factorio step).
 
-Requires OPENAI_API_KEY in `.env` and a running Factorio cluster.
+First contact with the online agent — no optimization, no compiled modules.
+Requires OPENAI_API_KEY and a running Factorio cluster.
 
 Usage:
     uv run python examples/04_dspy_agent_loop.py --steps 5
-    uv run python examples/04_dspy_agent_loop.py --env-id iron_plate_throughput --model openai/gpt-4o-mini
-    uv run python examples/04_dspy_agent_loop.py --load .fle/optimized_factorio_agent.json
 """
 
 from __future__ import annotations
@@ -17,14 +16,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-import dspy
-
 from factorio_gym.agent import (
     API_HINT,
     AgentConfig,
-    FactorioProgrammer,
     build_agent,
-    build_lm,
     propose_program,
 )
 from factorio_gym.env import (
@@ -37,7 +32,6 @@ from factorio_gym.env import (
     step_code,
 )
 
-# First REPL action: give the LM a real inventory + iron position, not an empty reset.
 BOOTSTRAP = """
 print(inspect_inventory())
 iron = nearest(Resource.IronOre)
@@ -51,27 +45,15 @@ def main() -> int:
     parser.add_argument("--run-idx", type=int, default=0)
     parser.add_argument("--steps", type=int, default=5)
     parser.add_argument("--model", default="openai/gpt-4o-mini")
-    parser.add_argument(
-        "--load",
-        default="",
-        help="Optional path to a DSPy module saved by examples/05_optimize_agent.py",
-    )
     args = parser.parse_args()
 
     load_project_env()
     info = get_environment_info(args.env_id) or {}
     goal = info.get("description") or args.env_id
     print(describe_env(args.env_id))
-    print(f"Model: {args.model} | steps={args.steps}")
+    print(f"Intro agent (baseline Predict) | model={args.model} | steps={args.steps}")
 
-    if args.load:
-        dspy.configure(lm=build_lm(AgentConfig(model=args.model)))
-        agent = dspy.Predict(FactorioProgrammer)
-        agent.load(args.load)
-        print(f"Loaded optimized module from {args.load}")
-    else:
-        agent = build_agent(AgentConfig(model=args.model))
-
+    agent = build_agent(AgentConfig(model=args.model))
     env = make_env(args.env_id, run_idx=args.run_idx)
     try:
         reset_env(env)

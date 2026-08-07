@@ -1,11 +1,17 @@
-"""Minimal DSPy agent that emits Factorio Python programs from observations."""
+"""Runtime DSPy agent: propose Factorio programs from observations.
+
+Optimization (teleprompting / compiling demos) lives elsewhere — see
+``examples/05_optimize_agent.py`` and ``factorio_gym.trainset``. Runtime only
+builds or loads a module; it never compiles.
+"""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
 import dspy
-from dspy.teleprompt import LabeledFewShot
+
 
 # Short API reminder passed as inventory_hint when the caller has nothing better.
 API_HINT = (
@@ -14,59 +20,6 @@ API_HINT = (
     "place_entity(entity=Prototype.BurnerMiningDrill, position=pos, direction=Direction.NORTH). "
     "insert_item(Prototype.Coal, drill, quantity=5). Always print()."
 )
-
-# Seed demos shared by the online loop and offline optimizer.
-SEED_DEMOS = [
-    dspy.Example(
-        goal="Create an automatic iron-ore factory that produces 16 iron-ore per 60 seconds.",
-        observation="Environment reset. No prior output.",
-        inventory_hint="burner-mining-drill=50, coal=500, transport-belt=500",
-        program=(
-            "iron = nearest(Resource.IronOre)\n"
-            "print(f'iron={iron}')\n"
-            "move_to(iron)\n"
-            "print(inspect_inventory())"
-        ),
-    ).with_inputs("goal", "observation", "inventory_hint"),
-    dspy.Example(
-        goal="Create an automatic iron-ore factory that produces 16 iron-ore per 60 seconds.",
-        observation="iron=Position(x=15.5, y=70.5)\nInventory(... burner-mining-drill=50, coal=500 ...)",
-        inventory_hint="player is at origin; iron is far — must move_to before placing",
-        program=(
-            "iron = nearest(Resource.IronOre)\n"
-            "move_to(iron)\n"
-            "drill = place_entity(\n"
-            "    entity=Prototype.BurnerMiningDrill,\n"
-            "    position=iron,\n"
-            "    direction=Direction.NORTH,\n"
-            ")\n"
-            "print(drill)"
-        ),
-    ).with_inputs("goal", "observation", "inventory_hint"),
-    dspy.Example(
-        goal="Create an automatic iron-ore factory that produces 16 iron-ore per 60 seconds.",
-        observation="BurnerMiningDrill(status=NO_FUEL, warnings=['out of fuel'])",
-        inventory_hint="coal=500",
-        program=(
-            "entities = get_entities()\n"
-            "print(entities)\n"
-            "drill = next(e for e in entities if e.name == 'burner-mining-drill')\n"
-            "insert_item(Prototype.Coal, drill, quantity=5)\n"
-            "sleep(5)\n"
-            "print(get_entities())"
-        ),
-    ).with_inputs("goal", "observation", "inventory_hint"),
-    dspy.Example(
-        goal="Find iron ore and report position.",
-        observation="(empty)",
-        inventory_hint="(none)",
-        program=(
-            "pos = nearest(Resource.IronOre)\n"
-            "print(f'iron={pos}')\n"
-            "print(inspect_inventory())"
-        ),
-    ).with_inputs("goal", "observation", "inventory_hint"),
-]
 
 
 class FactorioProgrammer(dspy.Signature):
@@ -98,8 +51,8 @@ class FactorioProgrammer(dspy.Signature):
 
 @dataclass
 class AgentConfig:
-    model: str = "openai/gpt-4o-mini"
-    max_tokens: int = 1024
+    model: str = "openai/gpt-5.1"
+    max_tokens: int = 8024
     temperature: float = 0.2
 
 
@@ -113,11 +66,20 @@ def build_lm(config: AgentConfig | None = None) -> dspy.LM:
 
 
 def build_agent(config: AgentConfig | None = None) -> dspy.Module:
-    """Return a Predict module with labeled FLE API demos."""
-    lm = build_lm(config)
-    dspy.configure(lm=lm)
-    student = dspy.Predict(FactorioProgrammer)
-    return LabeledFewShot(k=len(SEED_DEMOS)).compile(student, trainset=SEED_DEMOS)
+    """Return an unoptimized Predict module for online rollouts."""
+    dspy.configure(lm=build_lm(config))
+    return dspy.Predict(FactorioProgrammer)
+
+
+def load_agent(
+    path: str | Path,
+    config: AgentConfig | None = None,
+) -> dspy.Module:
+    """Load a compiled DSPy module previously saved by the optimizer."""
+    dspy.configure(lm=build_lm(config))
+    agent = dspy.Predict(FactorioProgrammer)
+    agent.load(str(path))
+    return agent
 
 
 def strip_code_fences(text: str) -> str:
