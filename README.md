@@ -3,7 +3,10 @@
 Local workspace for developing Factorio Learning Environment (FLE) scenarios and optimizing AI agents with DSPy.
 
 Official docs (0.3.x — partly outdated vs installed 0.4.x):
-https://jackhopkins.github.io/factorio-learning-environment/sphinx/build/html/getting_started/quickstart.html
+
+- [FLE 0.3.0 release / overview](https://jackhopkins.github.io/factorio-learning-environment/versions/0.3.0.html)
+- [Sphinx docs (API, tools, sprites, MCP)](https://jackhopkins.github.io/factorio-learning-environment/sphinx/build/html/)
+- [Quickstart](https://jackhopkins.github.io/factorio-learning-environment/sphinx/build/html/getting_started/quickstart.html)
 
 ## Quick start
 
@@ -29,6 +32,7 @@ uv run python examples/01_hello_world.py
 |-----|----------------|
 | [docs/SETUP.md](docs/SETUP.md) | Install, cluster, env vars, Apple Silicon notes |
 | [docs/HELLO_WORLD.md](docs/HELLO_WORLD.md) | First working program end-to-end |
+| [docs/VISUALIZATION.md](docs/VISUALIZATION.md) | PNG map dumps (no client) + optional live Factorio client |
 | [docs/SCENARIOS.md](docs/SCENARIOS.md) | Building scripted + LLM scenarios |
 | [docs/AI_OPTIMIZATION.md](docs/AI_OPTIMIZATION.md) | DSPy runtime vs optimization tracks |
 | [docs/GEPA_STARTER.md](docs/GEPA_STARTER.md) | Minimal GEPA optimize → load flow |
@@ -41,7 +45,9 @@ uv run python examples/01_hello_world.py
 | `examples/01_hello_world.py` | Connect + `nearest(Resource.IronOre)` |
 | `examples/02_list_environments.py` | List FLE task IDs |
 | `examples/03_scripted_miner.py` | Deterministic multi-step scenario |
-| `examples/04_dspy_agent_loop.py` | Intro DSPy agent loop (baseline Predict) |
+| `examples/09_visualize_renders.py` | Save map PNGs after each action |
+| `examples/10_live_client_watch.py` | Join Factorio client + slow watchable scenario |
+| `examples/04_dspy_agent_loop.py` | Intro DSPy agent loop (`--renders` for map PNGs) |
 | `examples/05_optimize_agent.py` | Offline BootstrapFewShot train |
 | `examples/06_run_inspect_eval.py` | Thin wrapper for `fle inspect-eval` |
 | `examples/07_gepa_train.py` | Offline GEPA train → save module |

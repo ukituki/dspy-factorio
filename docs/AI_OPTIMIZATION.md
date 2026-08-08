@@ -35,9 +35,15 @@ Core pieces:
 
 ```bash
 uv run python examples/04_dspy_agent_loop.py --steps 5 --model openai/gpt-4o-mini
+
+# Save a map PNG after each step (no Factorio desktop client needed)
+uv run python examples/04_dspy_agent_loop.py --steps 3 --renders
+open .fle/renders/dspy_agent/step_02.png
 ```
 
-Flow: bootstrap inventory + iron → `propose_program` → `step_code`. Uses signature + `API_HINT` only (no compiled demos).
+Flow: bootstrap inventory + iron → `propose_program` → `step_code` → optional
+`save_render`. Uses signature + `API_HINT` only (no compiled demos). See
+[VISUALIZATION.md](VISUALIZATION.md) § DSPy agent loop.
 
 ## Bootstrap train (example 05)
 

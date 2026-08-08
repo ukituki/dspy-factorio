@@ -66,14 +66,16 @@ Expected: a Position for iron ore and an inventory dump. First connect injects m
 ## 4. What to try next
 
 1. `uv run python examples/03_scripted_miner.py` — multi-step scripted scenario  
-2. `uv run python examples/04_dspy_agent_loop.py --steps 3` — LLM writes the programs  
-3. Read [SCENARIOS.md](SCENARIOS.md) to design your own task loop  
+2. `uv run python examples/10_live_client_watch.py` — watch in the Factorio client ([VISUALIZATION.md](VISUALIZATION.md))  
+3. `uv run python examples/09_visualize_renders.py` — PNG map dumps if you lack the client  
+4. `uv run python examples/04_dspy_agent_loop.py --steps 3` — LLM writes the programs  
+5. Read [SCENARIOS.md](SCENARIOS.md) to design your own task loop  
 
 ## 5. Useful in-game APIs (starter set)
 
 ```python
 nearest(Resource.IronOre)          # NEVER nearest("iron-ore")
-move_to(pos)                       # required before place_entity if far away
+move_to(iron)                      # Position arg — never move_to(pos=...); required before place_entity if far
 place_entity(entity=Prototype.BurnerMiningDrill, position=pos, direction=Direction.NORTH)
 place_entity_next_to(entity=Prototype.IronChest, reference_position=drill.drop_position, direction=Direction.SOUTH)
 insert_item(Prototype.Coal, drill, quantity=5)

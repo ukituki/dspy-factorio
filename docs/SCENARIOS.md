@@ -43,7 +43,7 @@ See `examples/03_scripted_miner.py`.
 **Tips**
 
 - Keep each step small and printable.
-- Call `move_to(pos)` before `place_entity` when the patch is far from the player (max place distance is ~10).
+- Call `move_to(iron)` (or `move_to(position=iron)`) before `place_entity` when the patch is far from the player (max place distance is ~10). Never `move_to(pos=...)`.
 - Use `Resource.*` / `Prototype.*` enums — string names raise AttributeError inside FLE.
 - Persist `info["output_game_state"]` if you need restore/resume later.
 - Failures in Lua/Python show up in `raw_text` — treat them as observations, not process crashes.

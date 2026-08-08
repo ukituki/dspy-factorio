@@ -50,7 +50,7 @@ Same rule for `place_entity(..., Prototype.BurnerMiningDrill, ...)`.
 
 ## `target position is too far away to place the entity`
 
-Player must be within ~10 tiles. Call `move_to(pos)` before `place_entity`.
+Player must be within ~10 tiles. Call `move_to(iron)` / `move_to(position=iron)` before `place_entity` — never `move_to(pos=...)`.
 
 ## Docker Desktop hangs / `500` on docker.sock
 

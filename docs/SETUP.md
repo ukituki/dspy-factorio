@@ -4,7 +4,7 @@
 
 - Docker Desktop running and responsive (`docker ps` returns quickly)
 - Python 3.13+ (this repo uses `uv`)
-- Optional: Factorio client install (mods path is auto-detected on macOS)
+- Optional but recommended: Factorio desktop client ≈ **2.0.73** to watch agents live ([VISUALIZATION.md](VISUALIZATION.md))
 
 ## Install
 

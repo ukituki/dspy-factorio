@@ -40,7 +40,7 @@ uv run python examples/08_gepa_run.py --steps 3
 | `gepa_metric` | Returns `dspy.Prediction(score=..., feedback=...)` |
 | `reflection_lm` | Stronger LM @ `temperature=1.0` that rewrites instructions from feedback |
 
-A float-only metric makes GEPA little better than random search. Feedback must say **what failed** and **what good looks like** (enums, `move_to`, no `nearest("iron-ore")`).
+A float-only metric makes GEPA little better than random search. Feedback must say **what failed** and **what good looks like** (enums, `move_to(iron)` not `move_to(pos=...)`, no `nearest("iron-ore")`).
 
 ## Files
 
