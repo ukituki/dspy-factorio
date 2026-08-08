@@ -32,7 +32,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import dspy
 
-from factorio_gym.agent import (
+from dspy_factorio.agent import (
     API_HINT,
     AgentConfig,
     FactorioProgrammer,
@@ -40,7 +40,7 @@ from factorio_gym.agent import (
     propose_program,
     strip_code_fences,
 )
-from factorio_gym.env import (
+from dspy_factorio.env import (
     describe_env,
     get_environment_info,
     load_project_env,
@@ -49,7 +49,7 @@ from factorio_gym.env import (
     reset_env,
     step_code,
 )
-from factorio_gym.flex_drill import (
+from dspy_factorio.flex_drill import (
     BOOTSTRAP,
     DEFAULT_FLEX_PROGRAM,
     DEFAULT_PLAY_DEMOS,

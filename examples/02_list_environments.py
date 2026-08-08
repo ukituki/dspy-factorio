@@ -15,7 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from factorio_gym.env import describe_env, list_envs, load_project_env
+from dspy_factorio.env import describe_env, list_envs, load_project_env
 
 
 def main() -> int:

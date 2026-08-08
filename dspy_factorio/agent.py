@@ -1,7 +1,7 @@
 """Runtime DSPy agent: propose Factorio programs from observations.
 
 Optimization (teleprompting / compiling demos) lives elsewhere — see
-``examples/05_optimize_agent.py`` and ``factorio_gym.trainset``. Runtime only
+``examples/05_optimize_agent.py`` and ``dspy_factorio.trainset``. Runtime only
 builds or loads a module; it never compiles.
 """
 

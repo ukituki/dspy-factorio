@@ -1,17 +1,31 @@
-# Factorio Gym
+# DSPy Factorio
 
-Local workspace for developing Factorio Learning Environment (FLE) scenarios and optimizing AI agents with DSPy.
+Step-by-step practice for learning **[DSPy](https://dspy.ai)** by playing **Factorio** through the [Factorio Learning Environment (FLE)](https://jackhopkins.github.io/factorio-learning-environment/).
 
-Official docs (0.3.x — partly outdated vs installed 0.4.x):
+You write (or optimize) small Python programs that act in the game — `Predict`, `GEPA`, `RLM`, `Flex` — and see the factory respond. The game is the gym; DSPy is what you’re learning.
 
-- [FLE 0.3.0 release / overview](https://jackhopkins.github.io/factorio-learning-environment/versions/0.3.0.html)
-- [Sphinx docs (API, tools, sprites, MCP)](https://jackhopkins.github.io/factorio-learning-environment/sphinx/build/html/)
-- [Quickstart](https://jackhopkins.github.io/factorio-learning-environment/sphinx/build/html/getting_started/quickstart.html)
+```text
+FLE / Factorio  ←── programs / tools ──  DSPy modules
+     obs text  ──────────────────────►  (Predict → GEPA → RLM → Flex)
+```
+
+## Learning path
+
+| Step | What you practice | Entry |
+|------|-------------------|-------|
+| 1 | Connect + one FLE program | [HELLO_WORLD.md](docs/HELLO_WORLD.md) · `examples/01_…` |
+| 2 | Scripted multi-step play | `examples/03_scripted_miner.py` |
+| 3 | DSPy `Predict` agent loop | `examples/04_dspy_agent_loop.py` |
+| 4 | Optimize instructions (GEPA) | [GEPA_STARTER.md](docs/GEPA_STARTER.md) · `07`/`08` |
+| 5 | REPL agent (`dspy.RLM`) | [RLM_STARTER.md](docs/RLM_STARTER.md) · `11` |
+| 6 | Structure search (`dspy.Flex`) | [FLEX_STARTER.md](docs/FLEX_STARTER.md) · `12`/`13a`/`13b` |
+
+Same early milestone across advanced paths: **place and fuel one burner mining drill**.
 
 ## Quick start
 
 ```bash
-# 1) deps (already in pyproject.toml)
+# 1) deps
 uv sync
 
 # 2) API keys
@@ -40,6 +54,12 @@ uv run python examples/01_hello_world.py
 | [docs/FLEX_STARTER.md](docs/FLEX_STARTER.md) | `dspy.Flex` intro → train from play → run |
 | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Docker / RCON / eval pitfalls we hit |
 
+FLE reference (0.3.x docs — partly outdated vs installed 0.4.x):
+
+- [Overview](https://jackhopkins.github.io/factorio-learning-environment/versions/0.3.0.html)
+- [Sphinx / API](https://jackhopkins.github.io/factorio-learning-environment/sphinx/build/html/)
+- [Quickstart](https://jackhopkins.github.io/factorio-learning-environment/sphinx/build/html/getting_started/quickstart.html)
+
 ## Examples
 
 | Script | Purpose |
@@ -64,7 +84,7 @@ uv run python examples/01_hello_world.py
 - `fle eval` is **removed** → use `fle inspect-eval`
 - Always pass `--model ...` (omitting it can crash)
 - With **one** Factorio container use `--epochs 1` (default Pass@8 needs 8 instances)
-- `gym.make(env_id)` needs `run_idx=0` — prefer `factorio_gym.env.make_env`
+- `gym.make(env_id)` needs `run_idx=0` — prefer `dspy_factorio.env.make_env`
 - Pin `a2a-sdk>=0.3.26,<1` (1.x breaks imports)
 - FLE still uses OpenAI `gym` (helpers silence deprecation noise; do not blindly switch to Gymnasium)
 - LLM agents must emit `Resource.*` / `Prototype.*` enums and `move_to` before distant placements
@@ -81,8 +101,10 @@ uv run fle inspect-eval \
 ## Project layout
 
 ```
-factorio_gym/          # env + agent + offline trainset
-examples/              # 04=Predict, 11=RLM, 12/13a/13b=Flex, 07/08=GEPA
-docs/                  # setup + tutorials
+dspy_factorio/          # env + agent + offline trainset
+examples/              # numbered DSPy / FLE practice scripts
+docs/                  # setup + step-by-step tutorials
 .env                   # secrets (gitignored)
 ```
+
+Repo: [github.com/ukituki/dspy-factorio](https://github.com/ukituki/dspy-factorio)

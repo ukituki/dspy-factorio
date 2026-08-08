@@ -50,7 +50,7 @@ uv run python examples/09_visualize_renders.py --mode simple --out .fle/renders/
 ### From your own scripts
 
 ```python
-from factorio_gym.env import make_env, reset_env, step_code, save_render
+from dspy_factorio.env import make_env, reset_env, step_code, save_render
 
 env = make_env("iron_ore_throughput", run_idx=0)
 reset_env(env)
@@ -116,8 +116,8 @@ Same pattern in your own DSPy loop — call `save_render` **after** `step_code`:
 
 ```python
 from pathlib import Path
-from factorio_gym.agent import API_HINT, AgentConfig, build_agent, propose_program
-from factorio_gym.env import make_env, reset_env, step_code, obs_text, save_render
+from dspy_factorio.agent import API_HINT, AgentConfig, build_agent, propose_program
+from dspy_factorio.env import make_env, reset_env, step_code, obs_text, save_render
 
 out = Path(".fle/renders/dspy_agent")
 agent = build_agent(AgentConfig(model="openai/gpt-4o-mini"))

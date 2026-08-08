@@ -29,7 +29,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from factorio_gym.env import (
+from dspy_factorio.env import (
     describe_env,
     load_project_env,
     make_env,
@@ -37,7 +37,7 @@ from factorio_gym.env import (
     reset_env,
     step_code,
 )
-from factorio_gym.live_client import connect_instructions, prepare_live_client
+from dspy_factorio.live_client import connect_instructions, prepare_live_client
 
 STEPS = [
     """

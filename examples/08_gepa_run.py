@@ -17,13 +17,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from factorio_gym.agent import (
+from dspy_factorio.agent import (
     API_HINT,
     AgentConfig,
     load_agent,
     propose_program,
 )
-from factorio_gym.env import (
+from dspy_factorio.env import (
     describe_env,
     get_environment_info,
     load_project_env,

@@ -1,4 +1,4 @@
-# `dspy.RLM` starter (Factorio Gym)
+# `dspy.RLM` starter (DSPy Factorio)
 
 Step-by-step tutorial: use DSPy's **Recursive Language Model** to place and fuel a burner mining drill on iron ore — the same simplest milestone as `examples/03_scripted_miner.py`, but driven by an LLM that explores via a Python REPL.
 
@@ -103,7 +103,7 @@ Built-ins also available: `llm_query(prompt)`, `llm_query_batched(prompts)`, `pr
 
 ```python
 import dspy
-from factorio_gym.env import make_env, reset_env, step_code, obs_text
+from dspy_factorio.env import make_env, reset_env, step_code, obs_text
 
 env = make_env("iron_ore_throughput", run_idx=0)
 reset_env(env)

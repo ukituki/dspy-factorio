@@ -20,9 +20,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import dspy
 
-from factorio_gym.agent import AgentConfig, FactorioProgrammer, build_lm, strip_code_fences
-from factorio_gym.env import load_project_env
-from factorio_gym.trainset import TRAIN_DEMOS, VAL_DEMOS
+from dspy_factorio.agent import AgentConfig, FactorioProgrammer, build_lm, strip_code_fences
+from dspy_factorio.env import load_project_env
+from dspy_factorio.trainset import TRAIN_DEMOS, VAL_DEMOS
 
 DEFAULT_SAVE = ".fle/gepa_factorio_agent.json"
 

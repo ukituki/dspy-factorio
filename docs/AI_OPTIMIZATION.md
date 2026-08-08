@@ -35,9 +35,9 @@ Run (08)       load_agent (Predict) ◄─────────────�
 
 Core pieces:
 
-- `factorio_gym/agent.py` — signature, `build_agent`, `load_agent`, `propose_program`
-- `factorio_gym/flex_drill.py` — shared drill goal / Flex load helpers for 12/13a/13b
-- `factorio_gym/trainset.py` — `TRAIN_DEMOS` / `VAL_DEMOS` (07; 13a uses play demos + `FLEX_VAL_DEMOS`)
+- `dspy_factorio/agent.py` — signature, `build_agent`, `load_agent`, `propose_program`
+- `dspy_factorio/flex_drill.py` — shared drill goal / Flex load helpers for 12/13a/13b
+- `dspy_factorio/trainset.py` — `TRAIN_DEMOS` / `VAL_DEMOS` (07; 13a uses play demos + `FLEX_VAL_DEMOS`)
 - `examples/04_…` — intro agent
 - `examples/05_…` — BootstrapFewShot train
 - `examples/07_…` / `08_…` — GEPA on Predict — [GEPA_STARTER.md](GEPA_STARTER.md)

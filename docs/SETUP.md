@@ -84,7 +84,7 @@ Note: `fle cluster start` regenerates this file — re-apply tweaks after regene
 | `FLE_DB_TYPE` | `sqlite` (default) or `postgres` |
 | `FLE_TRAJECTORY_LENGTH` | Steps for inspect-eval trajectories |
 
-Helpers in `factorio_gym.env.ensure_server_env()` set address/port defaults automatically.
+Helpers in `dspy_factorio.env.ensure_server_env()` set address/port defaults automatically.
 
 ## Verify installation
 

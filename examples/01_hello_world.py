@@ -18,7 +18,7 @@ from pathlib import Path
 # Allow running without installing the local package.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from factorio_gym.env import (
+from dspy_factorio.env import (
     describe_env,
     load_project_env,
     make_env,

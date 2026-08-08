@@ -1,4 +1,4 @@
-# `dspy.Flex` starter (Factorio Gym)
+# `dspy.Flex` starter (DSPy Factorio)
 
 Step-by-step tutorial: use DSPy's **Flex** module to place and fuel a burner mining drill on iron ore — the **same milestone** as [`RLM_STARTER.md`](RLM_STARTER.md) / `examples/03_scripted_miner.py`.
 
@@ -66,7 +66,7 @@ Full `iron_ore_throughput` wants 16 ore / 60s. This tutorial narrows the goal to
 
 ```python
 import dspy
-from factorio_gym.agent import FactorioProgrammer
+from dspy_factorio.agent import FactorioProgrammer
 
 flex = dspy.Flex(FactorioProgrammer)
 print(flex.module_src)   # thin Module wrapping one Predict

@@ -29,7 +29,7 @@ you  --Python-->  Factorio tools  --stdout-->  you
 ## 2. Minimal program
 
 ```python
-from factorio_gym.env import make_env, reset_env, step_code, obs_text
+from dspy_factorio.env import make_env, reset_env, step_code, obs_text
 
 env = make_env("iron_ore_throughput", run_idx=0)
 obs, info = reset_env(env)
@@ -61,7 +61,7 @@ Expected: a Position for iron ore and an inventory dump. First connect injects m
 | `gym.make("iron_ore_throughput")` → `missing run_idx` | Pass `run_idx=0` |
 | Docker discovery hangs | Set `FACTORIO_SERVER_ADDRESS=127.0.0.1` and `FACTORIO_SERVER_PORT=27000` (helpers do this) |
 | `import a2a.types.TextPart` fails | Keep `a2a-sdk<1` |
-| Deprecated `gym` import warnings | Use `factorio_gym.env` helpers (they silence gym-notices; FLE still needs `gym`) |
+| Deprecated `gym` import warnings | Use `dspy_factorio.env` helpers (they silence gym-notices; FLE still needs `gym`) |
 
 ## 4. What to try next
 

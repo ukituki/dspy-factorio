@@ -1,4 +1,4 @@
-# GEPA starter (Factorio Gym)
+# GEPA starter (DSPy Factorio)
 
 Minimal DSPy [GEPA](https://arxiv.org/abs/2507.19457) (Genetic-Pareto) demo with a clear train / run split. Independent from the intro agent loop (`examples/04_dspy_agent_loop.py`).
 
@@ -48,8 +48,8 @@ A float-only metric makes GEPA little better than random search. Feedback must s
 |------|------|
 | `examples/07_gepa_train.py` | Optimize / compile / save |
 | `examples/08_gepa_run.py` | Load saved program → Factorio |
-| `factorio_gym/trainset.py` | `TRAIN_DEMOS` / `VAL_DEMOS` |
-| `factorio_gym/agent.py` | Shared signature + `load_agent` |
+| `dspy_factorio/trainset.py` | `TRAIN_DEMOS` / `VAL_DEMOS` |
+| `dspy_factorio/agent.py` | Shared signature + `load_agent` |
 | `.fle/gepa_logs/` | GEPA checkpoints (`log_dir`) |
 
 ## Metric contract (copy this pattern)

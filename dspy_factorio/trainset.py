@@ -2,7 +2,7 @@
 
 Used only by train scripts (``examples/05_optimize_agent.py``,
 ``examples/07_gepa_train.py``). Flex ``13a`` collects its own play demos and
-uses ``FLEX_VAL_DEMOS`` (in ``factorio_gym.flex_drill``) as a held-out valset.
+uses ``FLEX_VAL_DEMOS`` (in ``dspy_factorio.flex_drill``) as a held-out valset.
 Intro/run rollouts never import this module for training.
 
 GEPA needs a **separate** valset — do not reuse TRAIN_DEMOS for both.

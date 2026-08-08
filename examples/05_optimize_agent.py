@@ -21,14 +21,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import dspy
 from dspy.teleprompt import BootstrapFewShot
 
-from factorio_gym.agent import (
+from dspy_factorio.agent import (
     AgentConfig,
     FactorioProgrammer,
     build_lm,
     strip_code_fences,
 )
-from factorio_gym.env import load_project_env
-from factorio_gym.trainset import TRAIN_DEMOS as SEED_DEMOS
+from dspy_factorio.env import load_project_env
+from dspy_factorio.trainset import TRAIN_DEMOS as SEED_DEMOS
 
 
 def program_metric(example, pred, trace=None) -> float:

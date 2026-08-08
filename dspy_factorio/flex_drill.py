@@ -9,7 +9,7 @@ from pathlib import Path
 
 import dspy
 
-from factorio_gym.agent import (
+from dspy_factorio.agent import (
     AgentConfig,
     FactorioProgrammer,
     build_lm,

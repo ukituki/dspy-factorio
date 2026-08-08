@@ -27,7 +27,7 @@ uv add 'a2a-sdk>=0.3.26,<1'
 ```python
 gym.make("iron_ore_throughput", run_idx=0)
 # or
-from factorio_gym.env import make_env
+from dspy_factorio.env import make_env
 make_env("iron_ore_throughput", run_idx=0)
 ```
 
@@ -35,7 +35,7 @@ Prefer `make_env` — it also silences OpenAI Gym deprecation notices and disabl
 
 ## Gym deprecation banner / observation-space warnings
 
-FLE still depends on unmaintained `gym` (not Gymnasium — separate registries). Importing via `factorio_gym.env` stubs `gym-notices` and uses `disable_env_checker=True`. Do not swap in Gymnasium for `gym.make` unless FLE registers into that registry too.
+FLE still depends on unmaintained `gym` (not Gymnasium — separate registries). Importing via `dspy_factorio.env` stubs `gym-notices` and uses `disable_env_checker=True`. Do not swap in Gymnasium for `gym.make` unless FLE registers into that registry too.
 
 ## `AttributeError: 'str' object has no attribute 'value'` from `nearest(...)`
 
@@ -103,7 +103,7 @@ Avoid `AWS_ACCESS_KEY_ID=""`. Use empty unquoted values or omit the keys. Prefer
 
 ## `UnsupportedParamsError: gpt-5 … don't support temperature=0.2`
 
-Most `gpt-5*` models (e.g. `gpt-5.5-luna`, `gpt-5-codex`) only accept `temperature=1`. `factorio_gym.agent.build_lm` forces `1.0` for those IDs; `gpt-5.1` and non-gpt-5 models keep `AgentConfig.temperature` (default `0.2`).
+Most `gpt-5*` models (e.g. `gpt-5.5-luna`, `gpt-5-codex`) only accept `temperature=1`. `dspy_factorio.agent.build_lm` forces `1.0` for those IDs; `gpt-5.1` and non-gpt-5 models keep `AgentConfig.temperature` (default `0.2`).
 
 ## Score is always 0
 

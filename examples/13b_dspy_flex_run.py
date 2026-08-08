@@ -20,8 +20,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from factorio_gym.agent import API_HINT, AgentConfig, propose_program
-from factorio_gym.env import (
+from dspy_factorio.agent import API_HINT, AgentConfig, propose_program
+from dspy_factorio.env import (
     describe_env,
     get_environment_info,
     load_project_env,
@@ -31,7 +31,7 @@ from factorio_gym.env import (
     save_render,
     step_code,
 )
-from factorio_gym.flex_drill import (
+from dspy_factorio.flex_drill import (
     BOOTSTRAP,
     DEFAULT_FLEX_PROGRAM,
     DRILL_GOAL,

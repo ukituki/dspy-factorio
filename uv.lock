@@ -692,7 +692,7 @@ wheels = [
 ]
 
 [[package]]
-name = "factorio-gym"
+name = "dspy-factorio"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from dotenv import dotenv_values
 
-from factorio_gym.env import load_project_env
+from dspy_factorio.env import load_project_env
 
 
 def main() -> int:

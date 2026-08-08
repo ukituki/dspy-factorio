@@ -23,7 +23,7 @@ Common starters:
 Use when validating the environment or collecting expert demos.
 
 ```python
-from factorio_gym.env import make_env, reset_env, step_code, obs_text
+from dspy_factorio.env import make_env, reset_env, step_code, obs_text
 
 STEPS = [
     "iron = nearest(Resource.IronOre); print(iron); move_to(iron)",
