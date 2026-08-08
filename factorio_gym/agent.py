@@ -16,8 +16,10 @@ import dspy
 # Short API reminder passed as inventory_hint when the caller has nothing better.
 API_HINT = (
     "Use enums + kwargs only. nearest(Resource.IronOre) — never nearest(\"iron-ore\"). "
-    "move_to(pos) before place_entity. "
-    "place_entity(entity=Prototype.BurnerMiningDrill, position=pos, direction=Direction.NORTH). "
+    "move_to(iron) or move_to(position=iron) — NEVER move_to(pos=...) "
+    "(TypeError: unexpected keyword argument 'pos'). "
+    "Call move_to before place_entity when far. "
+    "place_entity(entity=Prototype.BurnerMiningDrill, position=iron, direction=Direction.NORTH). "
     "insert_item(Prototype.Coal, drill, quantity=5). Always print()."
 )
 
@@ -31,8 +33,11 @@ class FactorioProgrammer(dspy.Signature):
     - Resources: nearest(Resource.IronOre) / Resource.Coal — NEVER nearest("iron-ore")
     - Entities: Prototype.BurnerMiningDrill, Prototype.WoodenChest, Prototype.TransportBelt,
       Prototype.Coal — NEVER place_entity("mining-drill", ...)
+    - Movement: move_to(iron) or move_to(position=iron). First arg is Position.
+      NEVER move_to(pos=...) — that raises TypeError.
+      Prefer: iron = nearest(Resource.IronOre); move_to(iron)
     - Placement: place_entity(entity=Prototype.X, position=pos, direction=Direction.NORTH)
-    - Distance: call move_to(pos) before place_entity if the target is far from the player
+    - Distance: call move_to(...) before place_entity if the target is far from the player
     - Fuel: insert_item(Prototype.Coal, drill, quantity=5)
     - Belts: connect_entities(source, target, connection_type=Prototype.TransportBelt)
     - Inspect: get_entities(), inspect_inventory(), sleep(n)

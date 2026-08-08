@@ -60,6 +60,13 @@ def gepa_metric(gold, pred, trace=None, pred_name=None, pred_trace=None):
     else:
         notes.append("No markdown fences; never nearest(\"iron-ore\"). Prefer nearest(Resource.IronOre).")
 
+    if "move_to(pos=" in program or "move_to(pos =" in program:
+        notes.append(
+            "move_to takes Position positionally or as position=... — NEVER move_to(pos=...). "
+            "Use: iron = nearest(Resource.IronOre); move_to(iron)"
+        )
+        score = min(score, 0.5)
+
     gold_prog = getattr(gold, "program", "") or ""
     if "move_to(" in gold_prog and "move_to(" not in program:
         notes.append("Gold uses move_to before placement — include move_to when the target is far.")

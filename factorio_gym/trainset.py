@@ -42,7 +42,10 @@ TRAIN_DEMOS = [
     _ex(
         goal="Create an automatic iron-ore factory that produces 16 iron-ore per 60 seconds.",
         observation="iron=Position(x=15.5, y=70.5)\nInventory(... burner-mining-drill=50, coal=500 ...)",
-        inventory_hint="player is at origin; iron is far — must move_to before placing",
+        inventory_hint=(
+            "player is at origin; iron is far — must move_to(iron) before placing "
+            "(never move_to(pos=...))"
+        ),
         program=(
             "iron = nearest(Resource.IronOre)\n"
             "move_to(iron)\n"
