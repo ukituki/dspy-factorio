@@ -6,7 +6,8 @@ import os
 import sys
 import types
 from collections.abc import Mapping
-from typing import Any
+from pathlib import Path
+from typing import Any, Literal
 
 # FLE still depends on OpenAI Gym. Silence the gym-notices deprecation banner
 # before that import (Gymnasium is not a drop-in here: separate registries).
@@ -90,6 +91,79 @@ def obs_text(obs: Mapping[str, Any]) -> str:
     return str(obs.get("text") or "")
 
 
+def namespace(env, *, agent_idx: int = 0):
+    """Return the FLE namespace for an agent (tools like ``_render`` live here)."""
+    return env.unwrapped.instance.namespaces[agent_idx]
+
+
+def overview_center(env, *, agent_idx: int = 0):
+    """Midpoint between the player and nearest iron ore (keeps both in frame).
+
+    ``_render_simple`` caps radius around ~44 tiles even when zoomed out, so a
+    player-centered view at spawn still misses iron near ``y≈70``. Centering on
+    this midpoint with ``zoom≈0.25`` usually shows spawn + ore together.
+    """
+    from fle.env import Position
+    from fle.env.game_types import Resource
+
+    ns = namespace(env, agent_idx=agent_idx)
+    player = ns.player_location
+    iron = ns.nearest(Resource.IronOre)
+    return Position(x=(player.x + iron.x) / 2, y=(player.y + iron.y) / 2)
+
+
+def render_map(
+    env,
+    *,
+    mode: Literal["simple", "sprites"] = "simple",
+    agent_idx: int = 0,
+    zoom: float | None = None,
+    overview: bool = False,
+    **kwargs: Any,
+):
+    """Render the current map around the player (or an overview center).
+
+    - ``simple``: schematic grid (no sprite assets required)
+    - ``sprites``: Factorio-like pixels (needs ``uv run fle sprites`` first)
+    - ``zoom`` < 1 zooms out (more tiles). ``0.25`` is a good wide default.
+    - ``overview=True``: center between player and nearest iron so both stay visible
+
+    Returns an FLE ``RenderedImage`` (``.save(path)``, ``.show()``, ``.to_base64()``).
+    """
+    ns = namespace(env, agent_idx=agent_idx)
+    if zoom is not None:
+        kwargs.setdefault("zoom", zoom)
+    if overview and "position" not in kwargs:
+        kwargs["position"] = overview_center(env, agent_idx=agent_idx)
+    if mode == "sprites":
+        return ns._render(**kwargs)
+    return ns._render_simple(**kwargs)
+
+
+def save_render(
+    env,
+    path: str | Path,
+    *,
+    mode: Literal["simple", "sprites"] = "simple",
+    agent_idx: int = 0,
+    zoom: float | None = None,
+    overview: bool = False,
+    **kwargs: Any,
+) -> Path:
+    """Render and write a PNG; returns the resolved path."""
+    out = Path(path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    render_map(
+        env,
+        mode=mode,
+        agent_idx=agent_idx,
+        zoom=zoom,
+        overview=overview,
+        **kwargs,
+    ).save(str(out))
+    return out
+
+
 def describe_env(env_id: str) -> str:
     info = get_environment_info(env_id) or {}
     desc = info.get("description") or "(no description)"
@@ -110,7 +184,11 @@ __all__ = [
     "list_envs",
     "load_project_env",
     "make_env",
+    "namespace",
     "obs_text",
+    "overview_center",
+    "render_map",
     "reset_env",
+    "save_render",
     "step_code",
 ]
