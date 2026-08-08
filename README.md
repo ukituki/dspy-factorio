@@ -37,6 +37,7 @@ uv run python examples/01_hello_world.py
 | [docs/AI_OPTIMIZATION.md](docs/AI_OPTIMIZATION.md) | DSPy runtime vs optimization tracks |
 | [docs/GEPA_STARTER.md](docs/GEPA_STARTER.md) | Minimal GEPA optimize → load flow |
 | [docs/RLM_STARTER.md](docs/RLM_STARTER.md) | `dspy.RLM` REPL agent → place a fueled drill |
+| [docs/FLEX_STARTER.md](docs/FLEX_STARTER.md) | `dspy.Flex` intro → train from play → run |
 | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Docker / RCON / eval pitfalls we hit |
 
 ## Examples
@@ -54,6 +55,9 @@ uv run python examples/01_hello_world.py
 | `examples/07_gepa_train.py` | Offline GEPA train → save module |
 | `examples/08_gepa_run.py` | Run a GEPA-compiled module in Factorio |
 | `examples/11_dspy_rlm_miner.py` | `dspy.RLM` + `run_factorio` tool ([RLM_STARTER.md](docs/RLM_STARTER.md)) |
+| `examples/12_dspy_flex_miner.py` | Flex intro (baseline), same drill goal ([FLEX_STARTER.md](docs/FLEX_STARTER.md)) |
+| `examples/13a_dspy_flex_train.py` | Online play → demos → Flex+GEPA compile |
+| `examples/13b_dspy_flex_run.py` | Load learned Flex → Factorio rollout |
 
 ## Important 0.4.x differences from upstream quickstart
 
@@ -78,7 +82,7 @@ uv run fle inspect-eval \
 
 ```
 factorio_gym/          # env + agent + offline trainset
-examples/              # 04=Predict loop, 11=RLM, 07/08=GEPA
+examples/              # 04=Predict, 11=RLM, 12/13a/13b=Flex, 07/08=GEPA
 docs/                  # setup + tutorials
 .env                   # secrets (gitignored)
 ```

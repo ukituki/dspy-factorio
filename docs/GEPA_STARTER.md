@@ -91,5 +91,6 @@ Defaults in `07`:
 3. Try `auto="medium"` only after `light` looks sane  
 4. Optional: chain Bootstrap → GEPA with `dspy.BetterTogether`  
 5. Multi-module agents: GEPA’s per-predictor feedback shines once you split Planner/Coder  
+6. Or learn Flex structure from online play — [FLEX_STARTER.md](FLEX_STARTER.md) (`13a` / `13b`)  
 
 Do **not** call `dspy.GEPA(...).compile()` inside `08_gepa_run.py`.

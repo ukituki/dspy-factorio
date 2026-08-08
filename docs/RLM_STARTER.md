@@ -2,6 +2,8 @@
 
 Step-by-step tutorial: use DSPy's **Recursive Language Model** to place and fuel a burner mining drill on iron ore — the same simplest milestone as `examples/03_scripted_miner.py`, but driven by an LLM that explores via a Python REPL.
 
+Sibling path (same goal, outer loop instead of REPL): [FLEX_STARTER.md](FLEX_STARTER.md) / [`examples/12_dspy_flex_miner.py`](../examples/12_dspy_flex_miner.py).
+
 Runnable script: [`examples/11_dspy_rlm_miner.py`](../examples/11_dspy_rlm_miner.py).
 
 ## 0. Prerequisites
@@ -21,17 +23,19 @@ which deno
 
 3. Optional: stop other scripts that hold the Factorio instance (e.g. `10_live_client_watch.py`) so this example can `reset` cleanly.
 
-## 1. Mental model: RLM vs example 04
+## 1. Mental model: RLM vs example 04 (and Flex)
 
-| | `04_dspy_agent_loop` | `11_dspy_rlm_miner` |
-|--|----------------------|---------------------|
-| Loop owner | **Your** Python `for step in …` | **RLM** REPL iterations |
-| Each LLM turn | Emits one Factorio program | Emits sandbox Python that may call tools |
-| Factorio access | You call `step_code` | Tool `run_factorio(code)` |
-| When it stops | `--steps N` or env done | `SUBMIT(...)` or `max_iters` |
+| | `04_dspy_agent_loop` | `11_dspy_rlm_miner` | `12` / `13b` Flex |
+|--|----------------------|---------------------|---------------------|
+| Goal | Broader / quota-oriented | Place + fuel one drill | **Same as 11** |
+| Loop owner | **Your** Python `for step` | **RLM** REPL iterations | **Your** Python `for step` |
+| Each LLM turn | Emits one Factorio program | Sandbox Python that may call tools | One FLE program (via Flex) |
+| Factorio access | You call `step_code` | Tool `run_factorio(code)` | You call `step_code` |
+| When it stops | `--steps N` or env done | `SUBMIT(...)` or `max_iters` | Fueled-drill heuristic / `--steps` |
+| Learning | — | — | `13a` learns `module_src` from online play |
 
 ```text
-04:  LM ──program──► Factorio ──obs──► LM ──program──► …
+04 / 12 / 13b:  LM ──program──► Factorio ──obs──► LM ──program──► …
 
 11:  LM ──sandbox Python──► Deno REPL
               │
@@ -40,7 +44,7 @@ which deno
               └── SUBMIT(summary=…, success=…)
 ```
 
-RLM shines when the agent should **probe, fix errors, and decide the next probe in code** — not when you already have a fixed outer step budget (use `04` / GEPA for that).
+RLM shines when the agent should **probe, fix errors, and decide the next probe in code**. Use `04` / Flex when you already want a fixed outer step budget. Flex intro is `12`; learn-from-play is `13a` → `13b` ([FLEX_STARTER.md](FLEX_STARTER.md)).
 
 Official module docs: [dspy.RLM](https://dspy.ai/api/modules/RLM/).
 
@@ -185,14 +189,16 @@ Security note: default interpreter is sandboxed WASM. Your `run_factorio` tool i
 ```text
 01 hello world  →  03 scripted miner  →  04 Predict loop
                               ↘
-                               11 RLM (this doc)   ← REPL agent + tools
+                         ┌──── 11 RLM (this doc)  ← REPL + tools
+                         │         ↕ same drill goal
+                         └──── 12 Flex intro → 13a play-train → 13b run
                               ↗
-07/08 GEPA train/run  →  longer rollouts / inspect-eval
+07/08 GEPA on Predict  →  instruction search (hand-written demos)
 ```
 
 Next ideas once this works:
 
 1. Widen the goal toward real throughput (chest + belts + `sleep`)
 2. Add tools like `inspect_last_entities()` that return structured JSON
-3. Wrap RLM in a `dspy.Module` and optimize the outer signature with GEPA ([GEPA_STARTER.md](GEPA_STARTER.md))
-4. Compare cost/latency vs `04` on the same drill milestone
+3. Compare cost/latency vs Flex (`12` / `13b`) on the same drill milestone
+4. Wrap RLM in a `dspy.Module` and optimize with GEPA ([GEPA_STARTER.md](GEPA_STARTER.md))

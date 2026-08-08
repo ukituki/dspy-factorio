@@ -70,7 +70,9 @@ Expected: a Position for iron ore and an inventory dump. First connect injects m
 3. `uv run python examples/09_visualize_renders.py` — PNG map dumps if you lack the client  
 4. `uv run python examples/04_dspy_agent_loop.py --steps 3` — LLM writes the programs  
 5. `uv run python examples/11_dspy_rlm_miner.py --verbose` — `dspy.RLM` REPL agent ([RLM_STARTER.md](RLM_STARTER.md))  
-6. Read [SCENARIOS.md](SCENARIOS.md) to design your own task loop  
+6. `uv run python examples/12_dspy_flex_miner.py --verbose` — Flex intro ([FLEX_STARTER.md](FLEX_STARTER.md))  
+7. `uv run python examples/13a_dspy_flex_train.py --dry-run` — then `13a` (default 24 metric calls) / `13b` 
+8. Read [SCENARIOS.md](SCENARIOS.md) to design your own task loop  
 
 ## 5. Useful in-game APIs (starter set)
 

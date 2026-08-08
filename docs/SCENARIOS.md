@@ -66,7 +66,17 @@ For compiled GEPA agents use `07` (train) + `08` (run) — [GEPA_STARTER.md](GEP
 RLM sandbox  →  run_factorio(code) tool  →  Factorio  →  REPL  →  SUBMIT
 ```
 
-One RLM call explores with Deno/Pyodide Python and a host tool that steps FLE. Best for error-fixing / probe-then-act. Tutorial: [RLM_STARTER.md](RLM_STARTER.md) (`examples/11_dspy_rlm_miner.py`). Needs Deno installed.
+One RLM call explores with Deno/Pyodide Python and a host tool that steps FLE. Best for error-fixing / probe-then-act. Same fueled-drill milestone as Flex. Tutorial: [RLM_STARTER.md](RLM_STARTER.md) (`examples/11_dspy_rlm_miner.py`). Needs Deno installed.
+
+## Pattern B3 — `dspy.Flex` (intro → learn from play → run)
+
+```text
+12  baseline Flex outer loop (intro)
+13a play Factorio → demos → GEPA rewrites module_src
+13b load learned Flex → same drill goal
+```
+
+Same drill goal as RLM. Tutorial: [FLEX_STARTER.md](FLEX_STARTER.md) (`12` / `13a` / `13b`). Needs Deno.
 
 ## Pattern C — Official inspect-eval harness
 
