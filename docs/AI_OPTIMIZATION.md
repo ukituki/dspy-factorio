@@ -7,6 +7,7 @@ Keep **intro**, **train**, and **run** concerns separate:
 | Concern | Entry point | What it does |
 |---------|-------------|--------------|
 | **Intro runtime** | `examples/04_dspy_agent_loop.py` | Baseline `Predict` in Factorio (learning the loop) |
+| **RLM runtime** | `examples/11_dspy_rlm_miner.py` | `dspy.RLM` REPL + `run_factorio` tool — [RLM_STARTER.md](RLM_STARTER.md) |
 | **Bootstrap train** | `examples/05_optimize_agent.py` | Offline BootstrapFewShot → save JSON |
 | **GEPA train** | `examples/07_gepa_train.py` | Offline GEPA → save JSON — [GEPA_STARTER.md](GEPA_STARTER.md) |
 | **GEPA run** | `examples/08_gepa_run.py` | Load GEPA artifact → short Factorio rollout |
@@ -72,7 +73,7 @@ For reflective optimization with textual feedback, prefer GEPA: [GEPA_STARTER.md
 | Comparability | Low | High |
 | Best for | Prompt/engine R&D | Benchmark numbers |
 
-Recommended path: scripted `03` → intro `04` → GEPA train `07` → GEPA run `08` → measure with `06`.
+Recommended path: scripted `03` → intro `04` (or RLM `11`) → GEPA train `07` → GEPA run `08` → measure with `06`.
 
 ## Next upgrades
 

@@ -101,6 +101,10 @@ Re-installing FLE may revert the patch — re-apply or vendor a wrapper.
 
 Avoid `AWS_ACCESS_KEY_ID=""`. Use empty unquoted values or omit the keys. Prefer `dotenv` / `load_dotenv` over `source .env`.
 
+## `UnsupportedParamsError: gpt-5 … don't support temperature=0.2`
+
+Most `gpt-5*` models (e.g. `gpt-5.5-luna`, `gpt-5-codex`) only accept `temperature=1`. `factorio_gym.agent.build_lm` forces `1.0` for those IDs; `gpt-5.1` and non-gpt-5 models keep `AgentConfig.temperature` (default `0.2`).
+
 ## Score is always 0
 
 Short trajectories rarely meet throughput quotas. Increase `--trajectory-length` / `--steps`, fuel machines, and `sleep` so production accrues.

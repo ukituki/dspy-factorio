@@ -36,6 +36,7 @@ uv run python examples/01_hello_world.py
 | [docs/SCENARIOS.md](docs/SCENARIOS.md) | Building scripted + LLM scenarios |
 | [docs/AI_OPTIMIZATION.md](docs/AI_OPTIMIZATION.md) | DSPy runtime vs optimization tracks |
 | [docs/GEPA_STARTER.md](docs/GEPA_STARTER.md) | Minimal GEPA optimize → load flow |
+| [docs/RLM_STARTER.md](docs/RLM_STARTER.md) | `dspy.RLM` REPL agent → place a fueled drill |
 | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Docker / RCON / eval pitfalls we hit |
 
 ## Examples
@@ -52,6 +53,7 @@ uv run python examples/01_hello_world.py
 | `examples/06_run_inspect_eval.py` | Thin wrapper for `fle inspect-eval` |
 | `examples/07_gepa_train.py` | Offline GEPA train → save module |
 | `examples/08_gepa_run.py` | Run a GEPA-compiled module in Factorio |
+| `examples/11_dspy_rlm_miner.py` | `dspy.RLM` + `run_factorio` tool ([RLM_STARTER.md](docs/RLM_STARTER.md)) |
 
 ## Important 0.4.x differences from upstream quickstart
 
@@ -76,7 +78,7 @@ uv run fle inspect-eval \
 
 ```
 factorio_gym/          # env + agent + offline trainset
-examples/              # 04=intro agent, 07/08=GEPA train/run
+examples/              # 04=Predict loop, 11=RLM, 07/08=GEPA
 docs/                  # setup + tutorials
 .env                   # secrets (gitignored)
 ```

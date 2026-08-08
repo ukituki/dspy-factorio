@@ -60,6 +60,14 @@ Design knobs: `--steps`, model, observation truncation, `API_HINT`.
 
 For compiled GEPA agents use `07` (train) + `08` (run) — [GEPA_STARTER.md](GEPA_STARTER.md).
 
+## Pattern B2 — `dspy.RLM` (REPL owns the loop)
+
+```text
+RLM sandbox  →  run_factorio(code) tool  →  Factorio  →  REPL  →  SUBMIT
+```
+
+One RLM call explores with Deno/Pyodide Python and a host tool that steps FLE. Best for error-fixing / probe-then-act. Tutorial: [RLM_STARTER.md](RLM_STARTER.md) (`examples/11_dspy_rlm_miner.py`). Needs Deno installed.
+
 ## Pattern C — Official inspect-eval harness
 
 Use for comparable benchmarks and logging:

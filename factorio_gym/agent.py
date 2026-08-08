@@ -61,12 +61,25 @@ class AgentConfig:
     temperature: float = 0.2
 
 
+def _gpt5_fixed_temperature_only(model: str) -> bool:
+    """LiteLLM rejects non-1 temperature on most gpt-5* models.
+
+    gpt-5.1 supports custom temperature when reasoning_effort is unset/'none'.
+    gpt-5 / gpt-5.5 / gpt-5-codex only accept temperature=1.
+    """
+    name = model.lower().rsplit("/", 1)[-1]
+    if name.startswith("gpt-5.1"):
+        return False
+    return name.startswith("gpt-5")
+
+
 def build_lm(config: AgentConfig | None = None) -> dspy.LM:
     cfg = config or AgentConfig()
+    temperature = 1.0 if _gpt5_fixed_temperature_only(cfg.model) else cfg.temperature
     return dspy.LM(
         cfg.model,
         max_tokens=cfg.max_tokens,
-        temperature=cfg.temperature,
+        temperature=temperature,
     )
 
 
