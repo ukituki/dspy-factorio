@@ -61,25 +61,56 @@ class AgentConfig:
     temperature: float = 0.2
 
 
+def _model_basename(model: str) -> str:
+    return model.lower().rsplit("/", 1)[-1]
+
+
 def _gpt5_fixed_temperature_only(model: str) -> bool:
-    """LiteLLM rejects non-1 temperature on most gpt-5* models.
+    """LiteLLM rejects non-1 temperature on most gpt-5* / gpt-6* models.
 
     gpt-5.1 supports custom temperature when reasoning_effort is unset/'none'.
-    gpt-5 / gpt-5.5 / gpt-5-codex only accept temperature=1.
+    gpt-5 / gpt-5.5 / gpt-5-codex / gpt-6* only accept temperature=1.
     """
-    name = model.lower().rsplit("/", 1)[-1]
+    name = _model_basename(model)
     if name.startswith("gpt-5.1"):
         return False
-    return name.startswith("gpt-5")
+    return name.startswith(("gpt-5", "gpt-6", "o1", "o3", "o4"))
+
+
+def _needs_explicit_max_completion_tokens(model: str) -> bool:
+    """Models that reject ``max_tokens`` but are not DSPy "reasoning" remaps.
+
+    DSPy only remaps ``max_tokens`` → ``max_completion_tokens`` for its known
+    reasoning IDs (``gpt-5`` / ``o1`` / ``o3`` / …). Newer IDs like
+    ``gpt-6-astra`` still need the remapped param explicitly.
+    """
+    name = _model_basename(model)
+    # Covered by dspy.clients.lm._is_openai_reasoning_model — leave alone.
+    if name.startswith(("o1", "o3", "o4")):
+        return False
+    if name.startswith("gpt-5") and not name.startswith("gpt-5-chat"):
+        # Plain gpt-5 / gpt-5-mini / … are remapped by DSPy; dotted ids
+        # like gpt-5.1 / gpt-5.6-sol are not.
+        if name == "gpt-5" or name.startswith("gpt-5-"):
+            return False
+    return name.startswith(("gpt-5", "gpt-6"))
 
 
 def build_lm(config: AgentConfig | None = None) -> dspy.LM:
     cfg = config or AgentConfig()
     temperature = 1.0 if _gpt5_fixed_temperature_only(cfg.model) else cfg.temperature
+    if _needs_explicit_max_completion_tokens(cfg.model):
+        # Avoid duplicate max_completion_tokens when DSPy also remaps.
+        return dspy.LM(
+            cfg.model,
+            temperature=temperature,
+            max_tokens=None,
+            max_completion_tokens=cfg.max_tokens,
+        )
     return dspy.LM(
         cfg.model,
-        max_tokens=cfg.max_tokens,
         temperature=temperature,
+        max_tokens=cfg.max_tokens,
     )
 
 

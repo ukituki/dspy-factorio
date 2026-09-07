@@ -103,7 +103,11 @@ Avoid `AWS_ACCESS_KEY_ID=""`. Use empty unquoted values or omit the keys. Prefer
 
 ## `UnsupportedParamsError: gpt-5 … don't support temperature=0.2`
 
-Most `gpt-5*` models (e.g. `gpt-5.5-luna`, `gpt-5-codex`) only accept `temperature=1`. `dspy_factorio.agent.build_lm` forces `1.0` for those IDs; `gpt-5.1` and non-gpt-5 models keep `AgentConfig.temperature` (default `0.2`).
+Most `gpt-5*` / `gpt-6*` models only accept `temperature=1`. `dspy_factorio.agent.build_lm` forces `1.0` for those IDs; `gpt-5.1` and classic chat models keep `AgentConfig.temperature` (default `0.2`).
+
+## `Unsupported parameter: 'max_tokens' … Use 'max_completion_tokens'`
+
+Newer OpenAI models (`gpt-5*`, `gpt-6*`, `o1`/`o3`/`o4`) reject `max_tokens`. `build_lm` sends `max_completion_tokens` for those IDs and keeps `max_tokens` for older chat models.
 
 ## Score is always 0
 

@@ -1,0 +1,217 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.24.0",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "24a4ef409cd7a68ee0588be91e5f7030",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "af801029cd5ab885a53f520667bed78d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"explore-iron_ore_throughput\">Explore <code>iron_ore_throughput</code></h1>\n<span class=\"paragraph\">Guided walkthrough of how FLE <strong>tasks</strong> work \u2014 based on\n<a href=\"../../docs/TASKS_GUIDE.md\"><code>docs/TASKS_GUIDE.md</code></a>.</span>\n<span class=\"paragraph\">You do <strong>not</strong> need an LLM. Each action is a short <strong>Python program</strong> run\ninside Factorio; the reply is mostly <strong>text</strong> (<code>raw_text</code>) plus a reward.</span>\n<div class=\"language-text codehilite\"><pre><span></span><code>goal + inventory + map\n        \u2502\n        \u25bc\n   reset() \u2500\u2500\u25ba write Python \u2500\u2500\u25ba step() \u2500\u2500\u25ba read stdout / reward\n                    \u25b2                            \u2502\n                    \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 next program \u25c4\u2500\u2500\u2500\u2500\u2500\u2518\n</code></pre></div>\n<span class=\"paragraph\"><strong>Tip:</strong> In the notebook footer, set <em>On Cell Change</em> \u2192 <strong>lazy</strong> so live\nFactorio cells only run when you ask.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "332b09101ea4e4cfda61409a97af952f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"1-why-this-task\">1. Why this task?</h2>\n<table>\n<thead>\n<tr>\n<th>Property</th>\n<th>Value</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Env / task id</td>\n<td><code>iron_ore_throughput</code></td>\n</tr>\n<tr>\n<td>Goal</td>\n<td>Automate <strong>16 iron ore / 60 in-game seconds</strong></td>\n</tr>\n<tr>\n<td>Why easiest</td>\n<td>Mining only \u2014 no smelting, assemblers, or oil</td>\n</tr>\n<tr>\n<td>Agents</td>\n<td>1</td>\n</tr>\n<tr>\n<td>Typical horizon</td>\n<td>64 programs (lab-play default)</td>\n</tr>\n</tbody>\n</table>\n<span class=\"paragraph\">Harder tasks reuse the <strong>same loop</strong>; they mainly deepen the recipe tree.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "9107a965a9cf6f376e03d39ec4d22b89",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"2-task-metadata-no-factorio-needed\">2. Task metadata (no Factorio needed)</h2>\n<span class=\"paragraph\"><code>get_environment_info</code> / <code>describe_env</code> read the gym registry. Safe to run\neven when the cluster is down.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "5845e0fcdfbe0c03eb95d9b5a6e00f56",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>describe_env:</strong> <code>iron_ore_throughput: Create an automatic iron-ore factory that produces 16 iron-ore per 60 ingame seconds.</code></span></span><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Registry info keys / values:</strong></span></span><marimo-ui-element object-id='lEQa-0' random-id='34c2e435-e7ca-e86e-7f13-fb2910a40fde'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;key&#92;&quot;:&#92;&quot;description&#92;&quot;,&#92;&quot;value&#92;&quot;:&#92;&quot;Create an automatic iron-ore factory that produces 16 iron-ore per 60 ingame seconds.&#92;&quot;},{&#92;&quot;key&#92;&quot;:&#92;&quot;enable_vision&#92;&quot;,&#92;&quot;value&#92;&quot;:&#92;&quot;False&#92;&quot;},{&#92;&quot;key&#92;&quot;:&#92;&quot;num_agents&#92;&quot;,&#92;&quot;value&#92;&quot;:&#92;&quot;1&#92;&quot;},{&#92;&quot;key&#92;&quot;:&#92;&quot;task_config_path&#92;&quot;,&#92;&quot;value&#92;&quot;:&#92;&quot;iron_ore_throughput&#92;&quot;},{&#92;&quot;key&#92;&quot;:&#92;&quot;task_key&#92;&quot;,&#92;&quot;value&#92;&quot;:&#92;&quot;iron_ore_throughput&#92;&quot;}]&quot;' data-total-rows='5' data-total-columns='2' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-selection='&quot;multi&quot;' data-show-filters='false' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Other <code>*iron*</code> envs (7):</strong> <code>iron_gear_wheel_throughput</code>, <code>iron_ore_throughput</code>, <code>iron_plate_throughput</code>, <code>iron_gear_wheel_throughput_unbounded_steps_show_steps_true</code>, <code>iron_plate_throughput_multiagent_free</code>, <code>iron_plate_throughput_multiagent_impostor</code>, <code>iron_plate_throughput_multiagent_distrust</code></span></span></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "635c2b188e13070a25c7c419ff102de1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"whats-inside-a-task\">What\u2019s inside a task</h3>\n<span class=\"paragraph\">When you later <code>make_env(\"iron_ore_throughput\")</code>, FLE builds:</span>\n<ol>\n<li>A live Factorio instance (Docker / RCON)</li>\n<li>A <strong>task object</strong> (goal, inventory, scoring rule)</li>\n<li>A gym wrapper that turns programs into <code>step()</code> calls</li>\n</ol>\n<span class=\"paragraph\">Lab-play starts with a <strong>populated inventory</strong> and <strong>all tech researched</strong>.\nEarly friction is \u201cplace and fuel correctly,\u201d not grinding for a pickaxe.</span>\n<span class=\"paragraph\"><strong>Scoring (easy to miss):</strong> after each program the task roughly sleeps\n~60 in-game seconds, measures automatic iron-ore throughput, uses that as\n<strong>reward</strong>, and sets <strong>done</strong> when throughput \u2265 16.</span>\n<span class=\"paragraph\">So a program that only prints <code>nearest(Resource.IronOre)</code> often scores\n<code>reward=0.0</code> \u2014 correct; nothing is mining yet.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "5d32f2a2ba24d7c908011079b357607a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"3-connect-to-factorio\">3. Connect to Factorio</h2>\n<span class=\"paragraph\">Prerequisites:</span>\n<div class=\"language-bash codehilite\"><pre><span></span><code>uv<span class=\"w\"> </span>run<span class=\"w\"> </span>fle<span class=\"w\"> </span>cluster<span class=\"w\"> </span>start<span class=\"w\"> </span>-n<span class=\"w\"> </span><span class=\"m\">1</span>\n<span class=\"c1\"># wait until RCON is up \u2014 see docs/SETUP.md</span>\n</code></pre></div>\n<span class=\"paragraph\">Click <strong>Connect &amp; reset</strong> once. Re-clicking closes the previous session and\nopens a fresh one.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "9e99538425ee5046b931864d98863aa2",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: row;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 1rem'><marimo-ui-element object-id='SFPL-0' random-id='84fb76c5-e8ea-a7c6-518a-2202db4d4779'><marimo-button data-initial-value='0' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eConnect &amp;amp; reset&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-kind='&quot;success&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element><marimo-ui-element object-id='SFPL-1' random-id='b4fda53c-ea6a-d33a-0cf6-75bc64550380'><marimo-button data-initial-value='0' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eClose env&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-kind='&quot;danger&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "6acb44da0542fa95e443c35346f98463",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><em>Not connected.</em></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "9ed1b17f2742e11ad8a34f372b6922de",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"4-action-one-python-program\">4. Action = one Python program</h2>\n<span class=\"paragraph\">Each <code>step</code> sends an <code>Action</code> with:</span>\n<table>\n<thead>\n<tr>\n<th>Field</th>\n<th>Meaning</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><code>code</code></td>\n<td>Executable FLE Python (the whole \u201cmove\u201d)</td>\n</tr>\n<tr>\n<td><code>agent_idx</code></td>\n<td><code>0</code> for this task</td>\n</tr>\n<tr>\n<td><code>game_state</code></td>\n<td>Helpers usually pass the current state</td>\n</tr>\n</tbody>\n</table>\n<span class=\"paragraph\"><strong>Good:</strong></span>\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"n\">nearest</span><span class=\"p\">(</span><span class=\"n\">Resource</span><span class=\"o\">.</span><span class=\"n\">IronOre</span><span class=\"p\">)</span>\n<span class=\"n\">move_to</span><span class=\"p\">(</span><span class=\"n\">iron</span><span class=\"p\">)</span>\n<span class=\"n\">place_entity</span><span class=\"p\">(</span><span class=\"n\">entity</span><span class=\"o\">=</span><span class=\"n\">Prototype</span><span class=\"o\">.</span><span class=\"n\">BurnerMiningDrill</span><span class=\"p\">,</span> <span class=\"n\">position</span><span class=\"o\">=</span><span class=\"n\">iron</span><span class=\"p\">,</span> <span class=\"n\">direction</span><span class=\"o\">=</span><span class=\"n\">Direction</span><span class=\"o\">.</span><span class=\"n\">NORTH</span><span class=\"p\">)</span>\n<span class=\"n\">insert_item</span><span class=\"p\">(</span><span class=\"n\">Prototype</span><span class=\"o\">.</span><span class=\"n\">Coal</span><span class=\"p\">,</span> <span class=\"n\">drill</span><span class=\"p\">,</span> <span class=\"n\">quantity</span><span class=\"o\">=</span><span class=\"mi\">5</span><span class=\"p\">)</span>\n</code></pre></div>\n<span class=\"paragraph\"><strong>Bad</strong> (crashes inside FLE):</span>\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"n\">nearest</span><span class=\"p\">(</span><span class=\"s2\">&quot;iron-ore&quot;</span><span class=\"p\">)</span>\n<span class=\"n\">move_to</span><span class=\"p\">(</span><span class=\"n\">pos</span><span class=\"o\">=</span><span class=\"n\">iron</span><span class=\"p\">)</span>\n<span class=\"n\">place_entity</span><span class=\"p\">(</span><span class=\"s2\">&quot;mining-drill&quot;</span><span class=\"p\">,</span> <span class=\"o\">...</span><span class=\"p\">)</span>\n</code></pre></div>\n<span class=\"paragraph\">Edit the program below, then <strong>Run program</strong>. Start with the explore\nsnippet from the guide (find iron, print it).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "5f80d0ca432324422bcfaee38c812f6b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><marimo-ui-element object-id='Kclp-0' random-id='a2f5c59e-ac0b-60ef-cac7-577f30aef37a'><marimo-code-editor data-initial-value='&quot;iron = nearest(Resource.IronOre)&#92;nprint(iron)&#92;nprint(inspect_inventory())&#92;n&quot;' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eFLE program&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-language='&quot;python&quot;' data-placeholder='&quot;&quot;' data-disabled='false' data-show-copy-button='true' data-debounce='false'></marimo-code-editor></marimo-ui-element><marimo-ui-element object-id='Kclp-1' random-id='f63367d4-9596-c953-bbb6-a6f91814abd5'><marimo-button data-initial-value='0' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eRun program&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-kind='&quot;success&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "b3ffbea2fa503f7bfcb7b52df51cc82b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><marimo-callout-output data-html='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003ch3 id=&#92;&quot;step-result&#92;&quot;&#92;u003eStep result&#92;u003c/h3&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-kind='&quot;neutral&quot;'></marimo-callout-output><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>reward</strong> = <code>0.0</code> \u00b7 <strong>terminated</strong> = <code>False</code> \u00b7 <strong>truncated</strong> = <code>False</code> \u00b7 <strong>error_occurred</strong> = <code>False</code></span></span><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Expected: exploring / unfueled setups often show <code>reward=0.0</code> \u2014 nothing is mining yet.</span></span><marimo-accordion data-labels='[&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eraw_text (agent observation)&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;,&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eobservation keys&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;,&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003einfo highlights&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;]' data-multiple='false'><div><marimo-ui-element object-id='emfo-0' random-id='eacbdbfd-2298-6137-91d0-425f45dd0d89'><marimo-code-editor data-initial-value='&quot;2: (Position(x=15.5, y=70.5),)&#92;n3: (Inventory(wooden-chest=10, storage-tank=10, transport-belt=500, underground-belt=100, burner-inserter=50, inserter=50, medium-electric-pole=500, pipe=500, pipe-to-ground=100, boiler=2, steam-engine=2, burner-mining-drill=50, electric-mining-drill=50, offshore-pump=2, pumpjack=10, stone-furnace=10, electric-furnace=10, assembling-machine-2=10, oil-refinery=5, chemical-plant=5, coal=500),)&quot;' data-label='null' data-language='&quot;text&quot;' data-placeholder='&quot;&quot;' data-disabled='true' data-show-copy-button='true' data-debounce='false'></marimo-code-editor></marimo-ui-element></div><div><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><code>automated_score</code>, <code>character_positions</code>, <code>entities</code>, <code>flows</code>, <code>game_info</code>, <code>inventory</code>, <code>map_image</code>, <code>messages</code>, <code>raw_text</code>, <code>research</code>, <code>score</code>, <code>serialized_functions</code>, <code>task_info</code>, <code>task_verification</code></span></span></div><div><span class=\"markdown prose dark:prose-invert contents\"><ul>\n<li><code>error_occurred</code>: <code>False</code></li>\n<li><code>ticks</code>: <code>3600</code></li>\n<li>has <code>output_game_state</code>: <code>True</code></li>\n</ul></span></div></marimo-accordion></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "03ab3b589bcc89b8175572fdf9c327c5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"5-observation-fields-that-matter\">5. Observation fields that matter</h2>\n<table>\n<thead>\n<tr>\n<th>Field</th>\n<th>Friendly meaning</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><code>raw_text</code></td>\n<td>Stdout / stderr (+ throughput hint the task may append)</td>\n</tr>\n<tr>\n<td><code>task_info</code></td>\n<td>Goal text, task key, trajectory length</td>\n</tr>\n<tr>\n<td><code>inventory</code></td>\n<td>What you\u2019re carrying</td>\n</tr>\n<tr>\n<td><code>entities</code></td>\n<td>Machines on the map</td>\n</tr>\n<tr>\n<td><code>flows</code></td>\n<td>Production rates</td>\n</tr>\n<tr>\n<td><code>task_verification</code></td>\n<td>Quota hit yet?</td>\n</tr>\n</tbody>\n</table>\n<span class=\"paragraph\">Treat exceptions in <code>raw_text</code> as normal observations \u2014 fix them next step.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "557ef1a39927a01a18532b554124bdf4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Steps this session:</strong> 1</span></span><marimo-ui-element object-id='nWHF-0' random-id='71c98093-4aff-31a7-481d-e0dde9b2112a'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;n&#92;&quot;:1,&#92;&quot;reward&#92;&quot;:0.0,&#92;&quot;done&#92;&quot;:false,&#92;&quot;error&#92;&quot;:false,&#92;&quot;code_preview&#92;&quot;:&#92;&quot;iron = nearest(Resource.IronOre) print(iron) print(inspect_inventory())&#92;&quot;}]&quot;' data-total-rows='1' data-total-columns='5' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-selection='&quot;multi&quot;' data-show-filters='false' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "e95e71ade872852e3d832cd8e7295c12",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"6-suggested-next-programs\">6. Suggested next programs</h2>\n<span class=\"paragraph\">Paste these into the editor one at a time (same policy as\n<code>examples/03_scripted_miner.py</code>):</span>\n<span class=\"paragraph\"><strong>A \u2014 move + place drill</strong></span>\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"n\">iron</span> <span class=\"o\">=</span> <span class=\"n\">nearest</span><span class=\"p\">(</span><span class=\"n\">Resource</span><span class=\"o\">.</span><span class=\"n\">IronOre</span><span class=\"p\">)</span>\n<span class=\"n\">move_to</span><span class=\"p\">(</span><span class=\"n\">iron</span><span class=\"p\">)</span>\n<span class=\"n\">drill</span> <span class=\"o\">=</span> <span class=\"n\">place_entity</span><span class=\"p\">(</span>\n    <span class=\"n\">entity</span><span class=\"o\">=</span><span class=\"n\">Prototype</span><span class=\"o\">.</span><span class=\"n\">BurnerMiningDrill</span><span class=\"p\">,</span>\n    <span class=\"n\">position</span><span class=\"o\">=</span><span class=\"n\">iron</span><span class=\"p\">,</span>\n    <span class=\"n\">direction</span><span class=\"o\">=</span><span class=\"n\">Direction</span><span class=\"o\">.</span><span class=\"n\">NORTH</span><span class=\"p\">,</span>\n<span class=\"p\">)</span>\n<span class=\"nb\">print</span><span class=\"p\">(</span><span class=\"n\">drill</span><span class=\"p\">)</span>\n</code></pre></div>\n<span class=\"paragraph\"><strong>B \u2014 fuel it</strong></span>\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"n\">entities</span> <span class=\"o\">=</span> <span class=\"n\">get_entities</span><span class=\"p\">()</span>\n<span class=\"nb\">print</span><span class=\"p\">(</span><span class=\"n\">entities</span><span class=\"p\">)</span>\n<span class=\"n\">drill</span> <span class=\"o\">=</span> <span class=\"nb\">next</span><span class=\"p\">((</span><span class=\"n\">e</span> <span class=\"k\">for</span> <span class=\"n\">e</span> <span class=\"ow\">in</span> <span class=\"n\">entities</span> <span class=\"k\">if</span> <span class=\"n\">e</span><span class=\"o\">.</span><span class=\"n\">name</span> <span class=\"o\">==</span> <span class=\"s2\">&quot;burner-mining-drill&quot;</span><span class=\"p\">),</span> <span class=\"kc\">None</span><span class=\"p\">)</span>\n<span class=\"k\">if</span> <span class=\"n\">drill</span> <span class=\"ow\">is</span> <span class=\"ow\">not</span> <span class=\"kc\">None</span><span class=\"p\">:</span>\n    <span class=\"n\">insert_item</span><span class=\"p\">(</span><span class=\"n\">Prototype</span><span class=\"o\">.</span><span class=\"n\">Coal</span><span class=\"p\">,</span> <span class=\"n\">drill</span><span class=\"p\">,</span> <span class=\"n\">quantity</span><span class=\"o\">=</span><span class=\"mi\">5</span><span class=\"p\">)</span>\n    <span class=\"nb\">print</span><span class=\"p\">(</span><span class=\"n\">drill</span><span class=\"p\">)</span>\n<span class=\"nb\">print</span><span class=\"p\">(</span><span class=\"n\">inspect_inventory</span><span class=\"p\">())</span>\n</code></pre></div>\n<span class=\"paragraph\">You\u2019re \u201cdone\u201d on this task when a <strong>fueled</strong> miner sits on ore, ore has\nsomewhere to go (chest/belts), and measured rate \u2265 <strong>16 / 60s</strong>\n(<code>terminated=True</code>).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": "ffa9d5a1e61b6d045ce924a959eb4537",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"7-friction-cheat-sheet\">7. Friction cheat sheet</h2>\n<table>\n<thead>\n<tr>\n<th>Symptom</th>\n<th>Likely cause</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><code>missing run_idx</code></td>\n<td>Use <code>make_env(...)</code> (this notebook does)</td>\n</tr>\n<tr>\n<td>Hang on connect</td>\n<td>Cluster not ready \u2014 <a href=\"../../docs/SETUP.md\">SETUP.md</a></td>\n</tr>\n<tr>\n<td>Weird <code>AttributeError</code></td>\n<td>Strings instead of <code>Resource.*</code> / <code>Prototype.*</code></td>\n</tr>\n<tr>\n<td><code>unexpected keyword argument 'pos'</code></td>\n<td>Use <code>move_to(iron)</code>, not <code>move_to(pos=...)</code></td>\n</tr>\n<tr>\n<td>Always <code>reward=0</code></td>\n<td>No automated mining, or no fuel / output buffer</td>\n</tr>\n<tr>\n<td>Program \u201cfailed\u201d but process OK</td>\n<td>Read <code>raw_text</code> \u2014 errors are observations</td>\n</tr>\n</tbody>\n</table>\n<h3 id=\"where-next\">Where next</h3>\n<ul>\n<li>Scripted baseline: <code>uv run python examples/03_scripted_miner.py</code></li>\n<li>Maps: <a href=\"../../docs/VISUALIZATION.md\">VISUALIZATION.md</a></li>\n<li>LLM loop: <code>uv run python examples/04_dspy_agent_loop.py --steps 5</code></li>\n<li>Design loops: <a href=\"../../docs/SCENARIOS.md\">SCENARIOS.md</a></li>\n</ul>\n<span class=\"paragraph\"><strong>Bottom line:</strong> this env is the smallest complete FLE contract \u2014\n<strong>goal, kit, program-in / text-out, throughput score</strong>.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}
