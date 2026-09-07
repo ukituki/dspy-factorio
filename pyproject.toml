@@ -8,6 +8,7 @@ dependencies = [
     "a2a-sdk>=0.3.26,<1",
     "dspy>=3.3.0",
     "factorio-learning-environment[eval]>=0.4.3",
+    "marimo>=0.24.0",
     "python-dotenv>=1.0.1",
 ]
 
