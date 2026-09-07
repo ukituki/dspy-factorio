@@ -112,6 +112,51 @@ def overview_center(env, *, agent_idx: int = 0):
     return Position(x=(player.x + iron.x) / 2, y=(player.y + iron.y) / 2)
 
 
+def factory_focus(env, *, agent_idx: int = 0):
+    """Center on placed drills/chests/belts when present; else spawn+iron midpoint."""
+    from fle.env import Position
+
+    ns = namespace(env, agent_idx=agent_idx)
+    try:
+        entities = ns.get_entities()
+    except Exception:
+        return overview_center(env, agent_idx=agent_idx)
+
+    focus_names = {
+        "burner-mining-drill",
+        "electric-mining-drill",
+        "wooden-chest",
+        "iron-chest",
+        "transport-belt",
+        "burner-inserter",
+        "inserter",
+    }
+    points = [e.position for e in entities if getattr(e, "name", None) in focus_names]
+    if not points:
+        return overview_center(env, agent_idx=agent_idx)
+    return Position(
+        x=sum(p.x for p in points) / len(points),
+        y=sum(p.y for p in points) / len(points),
+    )
+
+
+def new_render_session_dir(
+    base: str | Path = ".fle/renders/dspy_agent",
+    *,
+    tag: str = "",
+) -> Path:
+    """Timestamped folder per run so PNGs are never confused with an old session."""
+    from datetime import datetime
+
+    root = Path(base)
+    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    slug = "".join(c if c.isalnum() or c in "-_" else "_" for c in tag.strip())[:48]
+    name = f"{stamp}_{slug}" if slug else stamp
+    out = root / name
+    out.mkdir(parents=True, exist_ok=True)
+    return out
+
+
 def render_map(
     env,
     *,
@@ -126,7 +171,7 @@ def render_map(
     - ``simple``: schematic grid (no sprite assets required)
     - ``sprites``: Factorio-like pixels (needs ``uv run fle sprites`` first)
     - ``zoom`` < 1 zooms out (more tiles). ``0.25`` is a good wide default.
-    - ``overview=True``: center between player and nearest iron so both stay visible
+    - ``overview=True``: center on factory entities when present, else player+iron
 
     Returns an FLE ``RenderedImage`` (``.save(path)``, ``.show()``, ``.to_base64()``).
     """
@@ -134,7 +179,7 @@ def render_map(
     if zoom is not None:
         kwargs.setdefault("zoom", zoom)
     if overview and "position" not in kwargs:
-        kwargs["position"] = overview_center(env, agent_idx=agent_idx)
+        kwargs["position"] = factory_focus(env, agent_idx=agent_idx)
     if mode == "sprites":
         return ns._render(**kwargs)
     return ns._render_simple(**kwargs)
@@ -180,11 +225,13 @@ def list_envs(*, throughput_only: bool = False) -> list[str]:
 __all__ = [
     "describe_env",
     "ensure_server_env",
+    "factory_focus",
     "get_environment_info",
     "list_envs",
     "load_project_env",
     "make_env",
     "namespace",
+    "new_render_session_dir",
     "obs_text",
     "overview_center",
     "render_map",

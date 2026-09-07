@@ -70,22 +70,21 @@ each LLM step:
 ```bash
 uv run fle cluster start -n 1          # if needed
 # needs OPENAI_API_KEY in .env
-uv run python examples/04_dspy_agent_loop.py --steps 3 --renders
-open .fle/renders/dspy_agent/step_00_reset.png
-open .fle/renders/dspy_agent/step_03.png
+uv run python examples/04_dspy_agent_loop.py --steps 3
+open .fle/renders/dspy_agent/<session>/step_03.png
 ```
 
 | Flag | Default | Meaning |
 |------|---------|---------|
-| `--renders` | off | Enable map PNGs |
-| `--render-dir` | `.fle/renders/dspy_agent` | Output folder |
+| `--renders` / `--no-renders` | renders on | Map PNGs per step |
+| `--render-dir` | `.fle/renders/dspy_agent` | Parent folder; each run gets a timestamped subfolder |
 | `--render-mode` | `simple` | `simple` or `sprites` |
-| `--render-zoom` | `0.25` | Zoom out for `simple`. Still player-limited unless overview centering is on |
-| *(auto)* | overview on | `simple` renders center between **player and nearest iron** so both stay in frame (~44-tile radius cap) |
+| `--render-zoom` | `0.25` | Zoom out for `simple` (~80-tile view with overview) |
+| *(auto)* | overview on | Centers on **factory entities** when placed, else player+iron |
 
-The schematic renderer is **centered** (player, or overview midpoint) with a hard
-radius cap (~44 tiles). Default zoom alone is not enough when iron is at
-`y≈70` and the player is at spawn — hence overview centering.
+The schematic renderer is **centered** with a hard radius cap (~44 tiles).
+Default zoom plus overview centering keeps spawn and iron (`y≈70`) in frame.
+After drills/chests exist, renders follow the **factory centroid**.
 
 `move_to` must receive a `Position` — never `pos=`:
 
@@ -101,15 +100,16 @@ move_to(pos=(15.5, 70.5))
 
 `API_HINT` / the DSPy signature encode this; GEPA’s metric also penalizes `move_to(pos=`.
 
-Typical layout after `--steps 3 --renders`:
+Typical layout after `--steps 3`:
 
 ```text
 .fle/renders/dspy_agent/
-  step_00_reset.png
-  step_01_bootstrap.png   # inspect_inventory + nearest iron
-  step_02.png             # after agent step 1
-  step_03.png             # after agent step 2
-  step_04.png             # after agent step 3
+  20260823_012240_iron_ore_throughput_grok-4.6/
+    step_00_reset.png
+    step_01_bootstrap.png   # inspect_inventory + nearest iron
+    step_02.png             # after agent step 1
+    step_03.png             # after agent step 2
+    step_04.png             # after agent step 3
 ```
 
 Same pattern in your own DSPy loop — call `save_render` **after** `step_code`:
