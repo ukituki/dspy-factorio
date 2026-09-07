@@ -64,6 +64,24 @@ FLE reference (0.3.x docs — partly outdated vs installed 0.4.x):
 
 ## Examples
 
+### Meetup notebook: Predict → ChainOfThought
+
+```bash
+uv run marimo edit examples/04_dspy_agent_notebook.py
+```
+
+Interactive version of example 04: choose a model, task, step budget, and
+**Predict** or **ChainOfThought**, then click **Run new episode**. Each run
+resets Factorio, displays generated programs and game-state images, and keeps
+the model's written rationale beside the game response in ChainOfThought mode.
+Use marimo's presentation view for the talk and keep **On cell change → autorun**
+enabled. Changing controls alone does not start an episode.
+
+Requires the running Factorio cluster and provider credentials in `.env`.
+Fresh model requests bypass DSPy's cache. Images and JSON transcripts are saved
+under `.fle/renders/meetup/<episode>/`; the review picker keeps runs from the
+current notebook session. The displayed stop reason is not a success verdict.
+
 | Script | Purpose |
 |--------|---------|
 | `examples/01_hello_world.py` | Connect + `nearest(Resource.IronOre)` |
@@ -72,6 +90,7 @@ FLE reference (0.3.x docs — partly outdated vs installed 0.4.x):
 | `examples/09_visualize_renders.py` | Save map PNGs after each action |
 | `examples/10_live_client_watch.py` | Join Factorio client + slow watchable scenario |
 | `examples/04_dspy_agent_loop.py` | Intro DSPy agent loop (`--renders` for map PNGs) |
+| `examples/04_dspy_agent_notebook.py` | Meetup notebook: model selection, Predict/ChainOfThought, images and episode review |
 | `examples/05_optimize_agent.py` | Offline BootstrapFewShot train |
 | `examples/06_run_inspect_eval.py` | Thin wrapper for `fle inspect-eval` |
 | `examples/07_gepa_train.py` | Offline GEPA train → save module |

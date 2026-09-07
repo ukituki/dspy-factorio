@@ -16,3 +16,6 @@ wheels/
 # Editor / OS
 .DS_Store
 *.eval
+
+# Local notebook outputs and session state
+examples/__marimo__/
