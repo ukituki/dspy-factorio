@@ -70,7 +70,7 @@ FLE reference (0.3.x docs — partly outdated vs installed 0.4.x):
 uv run marimo edit examples/04_dspy_agent_notebook.py
 ```
 
-Interactive version of example 04: choose a model, task, step budget, and
+Interactive version of example 04: choose a model, registered scenario, step budget, and
 **Predict** or **ChainOfThought**, then click **Run new episode**. Each run
 resets Factorio, displays generated programs and game-state images, and keeps
 the model's written rationale beside the game response in ChainOfThought mode.
@@ -81,6 +81,11 @@ Requires the running Factorio cluster and provider credentials in `.env`.
 Fresh model requests bypass DSPy's cache. Images and JSON transcripts are saved
 under `.fle/renders/meetup/<episode>/`; the review picker keeps runs from the
 current notebook session. The displayed stop reason is not a success verdict.
+
+The walkthrough starts with the game loop, introduces the actual DSPy signature,
+then compares modules. Scenario goals come directly from FLE's registry; startup
+only inspects inventory and entities. Try iron ore, iron plates, gears, or circuits
+with the same agent. The episode table and saved transcripts record the scenario.
 
 | Script | Purpose |
 |--------|---------|

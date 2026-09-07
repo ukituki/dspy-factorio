@@ -8,8 +8,8 @@ agent's generated program and the game's response. The audience should see
 the connection between a decision and a visible change in the world.
 
 The presentation notebook is `examples/04_dspy_agent_notebook.py`, based on
-the Predict loop from `examples/04_dspy_agent_loop.py`. It includes a one-drill
-goal, the full throughput task, model selection, a Predict/ChainOfThought
+the Predict loop from `examples/04_dspy_agent_loop.py`. It includes registered
+scenario selection, model selection, a Predict/ChainOfThought
 switch, inline map images, and episode review. Launch it with:
 
 ```bash
@@ -19,7 +19,13 @@ uv run marimo edit examples/04_dspy_agent_notebook.py
 Use presentation view and keep autorun enabled. The run button is the explicit
 gate: changing settings does not run the game. Each episode resets the map and
 saves a transcript and PNGs under `.fle/renders/meetup/`. The camera zooms in
-once a drill appears. The original CLI script remains available unchanged.
+around placed machines in any scenario. The original CLI script remains available unchanged.
+
+The notebook now presents: **loop → signature → modules → scenario → episode**.
+Goals use the registry description without a drill-specific override. Use the
+one-drill milestone as narration while the actual task retains its throughput
+quota. Switching scenarios changes the environment and goal; startup only
+inspects inventory and existing entities.
 
 Suggested title: **“Can an LLM build a factory? Giving AI a world to act in.”**
 
