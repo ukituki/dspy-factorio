@@ -14,6 +14,7 @@ FLE / Factorio  ←── programs / tools ──  DSPy modules
 | Step | What you practice | Entry |
 |------|-------------------|-------|
 | 1 | Connect + one FLE program | [HELLO_WORLD.md](docs/HELLO_WORLD.md) · `examples/01_…` |
+| 1b | Task / obs / reward concepts | [TASKS_GUIDE.md](docs/TASKS_GUIDE.md) · `scenarios/1_iron_ore_throughput/01_explore_env.py` |
 | 2 | Scripted multi-step play | `examples/03_scripted_miner.py` |
 | 3 | DSPy `Predict` agent loop | `examples/04_dspy_agent_loop.py` |
 | 4 | Optimize instructions (GEPA) | [GEPA_STARTER.md](docs/GEPA_STARTER.md) · `07`/`08` |
@@ -46,6 +47,7 @@ uv run python examples/01_hello_world.py
 |-----|----------------|
 | [docs/SETUP.md](docs/SETUP.md) | Install, cluster, env vars, Apple Silicon notes |
 | [docs/HELLO_WORLD.md](docs/HELLO_WORLD.md) | First working program end-to-end |
+| [docs/TASKS_GUIDE.md](docs/TASKS_GUIDE.md) | Task concepts via `iron_ore_throughput` (goal, obs, reward) |
 | [docs/VISUALIZATION.md](docs/VISUALIZATION.md) | PNG map dumps (no client) + optional live Factorio client |
 | [docs/SCENARIOS.md](docs/SCENARIOS.md) | Building scripted + LLM scenarios |
 | [docs/AI_OPTIMIZATION.md](docs/AI_OPTIMIZATION.md) | DSPy runtime vs optimization tracks |

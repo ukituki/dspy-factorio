@@ -2,6 +2,8 @@
 
 A **scenario** here means a repeatable loop: reset a task → run N programs → score / log.
 
+New to tasks / observations / rewards? Start with [TASKS_GUIDE.md](TASKS_GUIDE.md) (`iron_ore_throughput` walkthrough).
+
 ## Choose a task
 
 ```bash
