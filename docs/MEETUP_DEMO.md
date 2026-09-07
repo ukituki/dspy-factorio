@@ -101,8 +101,9 @@ Choose the model using timed rehearsals; the existing script defaults to
    Flex text heuristic as proof: it can accept a program containing a coal
    insertion call without confirming that the call succeeded.
 3. Check the notebook at projector size and record a successful run as backup.
-   The in-session episode picker supports comparing runs; saved JSON and PNGs
-   remain on disk after the notebook session ends.
+   The episode picker reloads saved runs on open. Each step saves JSON and a
+   self-contained HTML replay with images, for offline presentation without
+   Factorio or model access.
 4. Compare Predict and ChainOfThought with the same model and budget. The
    displayed rationale is a model-written explanation, not a success verdict.
    Extra explanation does not guarantee better actions.

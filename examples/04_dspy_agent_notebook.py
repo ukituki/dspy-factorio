@@ -28,7 +28,6 @@ def imports():
     load_project_env()
     return (
         AgentConfig,
-        FactorioProgrammer,
         Path,
         build_lm,
         dspy,
@@ -46,6 +45,27 @@ def imports():
         time,
         uuid4,
     )
+
+
+@app.cell(hide_code=True)
+def harness_support():
+    from dspy_factorio.meetup import MODEL_OPTIONS, SIGNATURES, build_harness, comparison_row, peak_score, summarize_usage
+
+    return (
+        MODEL_OPTIONS,
+        SIGNATURES,
+        build_harness,
+        comparison_row,
+        peak_score,
+        summarize_usage,
+    )
+
+
+@app.cell(hide_code=True)
+def recording_support():
+    from dspy_factorio.recordings import load_saved_episodes, replay_html, save_episode
+
+    return load_saved_episodes, replay_html, save_episode
 
 
 @app.cell(hide_code=True)
@@ -73,49 +93,44 @@ def introduction(mo):
 
 
 @app.cell(hide_code=True)
-def explain_loop(FactorioProgrammer, mo):
+def explain_loop(SIGNATURES, mo, signature_picker):
+    _signature = SIGNATURES[signature_picker.value]
     _signature_lines = [
-        "class FactorioProgrammer(dspy.Signature):",
+        f"class {_signature.__name__}(dspy.Signature):",
         '    """Write one short Factorio Python program."""',
         "",
     ]
-    for _name, _field in FactorioProgrammer.input_fields.items():
+    for _name, _field in _signature.input_fields.items():
         _signature_lines.append(f"    {_name}: {_field.annotation.__name__} = dspy.InputField()")
-    for _name, _field in FactorioProgrammer.output_fields.items():
+    for _name, _field in _signature.output_fields.items():
         _signature_lines.append(f"    {_name}: {_field.annotation.__name__} = dspy.OutputField()")
     mo.vstack([
         mo.md("## DSPy: define the inputs and outputs\n**A Python library for model-based programs.**\n\n- **Signature:** the contract we give the model.\n- **Module:** how we ask it to produce the answer."),
         mo.md("```python\n" + "\n".join(_signature_lines) + "\n```"),
-        mo.md("**This is the agent's actual field schema.** `inventory_hint` carries API reminders."),
-        mo.accordion({"Full signature instructions": mo.plain_text(FactorioProgrammer.__doc__)}),
+        mo.md("**Selected signature: " + signature_picker.value + ".** `inventory_hint` carries API reminders."),
+        mo.accordion({"Full signature instructions": mo.plain_text(_signature.__doc__)}),
     ])
     return
 
 
 @app.cell(hide_code=True)
-def module_factory(FactorioProgrammer, dspy, mo):
-    def make_demo_agent(module_name: str) -> dspy.Module:
-        if module_name == "ChainOfThought":
-            return dspy.ChainOfThought(
-                FactorioProgrammer,
-                rationale_field=dspy.OutputField(
-                    desc="Brief action rationale: what the latest observation implies, "
-                         "what you will do next, and what game evidence to check."
-                ),
-            )
-        return dspy.Predict(FactorioProgrammer)
+def module_factory(build_harness, dspy, mo):
+    def make_demo_agent(module_name: str, signature_name: str) -> dspy.Module:
+        return build_harness(module_name, signature_name)
 
     mo.md("""
-    ## Same signature, two modules
+    ## Model × harness
+
+    **Harness = module × signature**
 
     ```python
-    agent = dspy.Predict(FactorioProgrammer)
-    agent = dspy.ChainOfThought(FactorioProgrammer)
+    agent = dspy.Predict(signature)
+    agent = dspy.ChainOfThought(signature)
     ```
 
-    - **Predict:** returns `program`.
-    - **ChainOfThought:** returns `reasoning` + `program`.
-    - Only `program` runs in Factorio. Check the rationale against game output.
+    - **Baseline:** original program-generation contract.
+    - **State-aware:** fresh state checks + an `expected_result` to verify.
+    - **ChainOfThought:** adds a written rationale to either signature.
     """)
     return (make_demo_agent,)
 
@@ -139,23 +154,25 @@ def scenario_catalog_cell(get_environment_info):
 
 
 @app.cell(hide_code=True)
-def controls(mo, scenario_options):
+def controls(MODEL_OPTIONS, SIGNATURES, mo, scenario_options):
     model_picker = mo.ui.dropdown(
-        ["openai/gpt-4o-mini", "openai/gpt-5.1", "Custom model"],
+        MODEL_OPTIONS,
         value="openai/gpt-4o-mini", label="Model", full_width=True,
     )
     custom_model = mo.ui.text(placeholder="provider/model", label="Custom model ID", full_width=True)
     module_picker = mo.ui.dropdown(["Predict", "ChainOfThought"], value="Predict", label="DSPy module")
+    signature_picker = mo.ui.dropdown(list(SIGNATURES), value="Baseline", label="Signature", full_width=True)
     scenario_picker = mo.ui.dropdown(scenario_options, value="Iron ore", searchable=True, label="Scenario", full_width=True)
     step_budget = mo.ui.slider(1, 10, value=4, step=1, label="Agent steps", show_value=True)
     run_episode = mo.ui.run_button(label="Run new episode · reset game", kind="success", full_width=True)
     mo.vstack([
         mo.md("## Change the task, keep the program"),
-        mo.hstack([model_picker, module_picker], widths="equal"),
+        model_picker,
+        mo.hstack([module_picker, signature_picker], widths="equal"),
         custom_model,
         mo.hstack([scenario_picker, step_budget], widths="equal"),
         run_episode,
-        mo.md("- Select a **scenario**, **model**, and **module** → **Run new episode**.\n- Every run resets the selected world. Changing settings alone does nothing.\n- Compare runs below; a step limit is not a success verdict."),
+        mo.md("- Select a **scenario**, **model**, and **harness** (module × signature) → **Run new episode**.\n- Every run resets the selected world. Changing settings alone does nothing.\n- Compare runs below; a step limit is not a success verdict."),
         mo.accordion({"Before presenting": mo.md("Cluster running · provider keys in `.env` · one game controller. Keep **On cell change → autorun** enabled. Use marimo interrupt to stop. Optional spectator: `127.0.0.1:34197`.")}),
     ])
     return (
@@ -164,6 +181,7 @@ def controls(mo, scenario_options):
         module_picker,
         run_episode,
         scenario_picker,
+        signature_picker,
         step_budget,
     )
 
@@ -190,8 +208,11 @@ def task(mo, scenario_catalog, scenario_picker):
 
 
 @app.cell(hide_code=True)
-def history_state(mo):
-    get_episodes, set_episodes = mo.state([])
+def history_state(load_saved_episodes, mo, project_root):
+    _saved, recording_issues = load_saved_episodes(project_root / ".fle" / "renders" / "meetup")
+    get_episodes, set_episodes = mo.state(_saved)
+    if recording_issues:
+        mo.output.append(mo.callout("Some recordings could not be loaded: " + "; ".join(recording_issues), kind="warn"))
     return get_episodes, set_episodes
 
 
@@ -209,6 +230,8 @@ def render_helpers(Path, html, mo):
         details = [mo.md(f"**{record['label']}**")]
         if record.get("reasoning"):
             details.extend([mo.md("**Model rationale · ChainOfThought**"), text_panel(record["reasoning"])])
+        if record.get("expected_result"):
+            details.extend([mo.md("**Expected result · check against the game**"), text_panel(record["expected_result"])])
         if record.get("program"):
             details.extend([mo.md("**Generated program**" if record["index"] > 0 else "**Scripted bootstrap**"), text_panel(record["program"])])
         details.extend([mo.md("**Game response**"), text_panel(record["observation"])])
@@ -248,29 +271,33 @@ def camera(Path, save_render):
 @app.cell(hide_code=True)
 def episode_loop(
     AgentConfig,
+    SIGNATURES,
     bootstrap,
     build_lm,
     custom_model,
     dspy,
     env_id,
     environment_description,
-    json,
     make_demo_agent,
     make_env,
     mo,
     model_picker,
     module_picker,
     obs_text,
+    peak_score,
     project_root,
     reset_env,
     run_episode,
+    save_episode,
     save_episode_image,
     scenario_api_hint,
     set_episodes,
+    signature_picker,
     step_budget,
     step_card,
     step_code,
     strip_code_fences,
+    summarize_usage,
     text_panel,
     time,
     uuid4,
@@ -285,13 +312,25 @@ def episode_loop(
     _out.mkdir(parents=True, exist_ok=True)
     _episode = {
         "id": _episode_id, "model": _model, "module": module_picker.value,
+        "signature": signature_picker.value, "signature_class": SIGNATURES[signature_picker.value].__name__,
+        "signature_instructions": SIGNATURES[signature_picker.value].__doc__,
         "scenario": env_id, "goal": _goal, "budget": step_budget.value, "steps": [], "status": "running",
         "elapsed": 0.0, "directory": str(_out),
     }
     _env = None
+    _lm = None
+    _call_pending = False
+
+    def _save_progress():
+        _episode["usage"] = summarize_usage(_lm.history if _lm is not None else [], incomplete=_call_pending)
+        _episode["max_score"] = peak_score(_episode["steps"])
+        _episode["elapsed"] = round(time.monotonic() - _started, 1)
+        save_episode(_episode)
+
+    _save_progress()
     mo.output.replace(mo.md(f"**Connecting to Factorio…** · {_model} · {module_picker.value}"))
     try:
-        _agent = make_demo_agent(module_picker.value)
+        _agent = make_demo_agent(module_picker.value, signature_picker.value)
         _lm = build_lm(AgentConfig(model=_model)).copy(cache=False, num_retries=0, timeout=45)
         _env = make_env(env_id, run_idx=0)
         reset_env(_env)
@@ -305,20 +344,27 @@ def episode_loop(
                    "reasoning": "", "observation": _observation, "image": str(_image),
                    "reward": float(_reward), "done": bool(_terminated or _truncated)}
         _episode["steps"].append(_record)
+        _save_progress()
         mo.output.append(step_card(_record))
 
-        with dspy.context(lm=_lm):
+        with dspy.context(lm=_lm, disable_history=False):
             for _step in range(1, int(step_budget.value) + 1):
                 if _terminated or _truncated:
                     break
                 mo.output.append(mo.md(f"**Step {_step}/{step_budget.value} · asking {_model}…**"))
+                _call_start = len(_lm.history)
+                _call_pending = True
+                _save_progress()
                 _prediction = _agent(goal=_goal, observation=_observation, inventory_hint=scenario_api_hint)
+                _call_pending = False
                 _program = strip_code_fences(_prediction.program)
                 _reasoning = getattr(_prediction, "reasoning", "") or ""
                 _record = {"index": _step, "label": f"Agent step {_step}", "program": _program,
-                           "reasoning": _reasoning, "observation": "Execution pending", "image": "",
+                           "reasoning": _reasoning, "expected_result": getattr(_prediction, "expected_result", "") or "",
+                           "usage": summarize_usage(_lm.history[_call_start:]), "observation": "Execution pending", "image": "",
                            "reward": None, "done": False}
                 _episode["steps"].append(_record)
+                _save_progress()
                 if _reasoning:
                     mo.output.append(mo.vstack([mo.md("**Model rationale · before execution**"), text_panel(_reasoning)]))
                 mo.output.append(text_panel(_program))
@@ -327,6 +373,7 @@ def episode_loop(
                 _record.update(observation=_observation, reward=float(_reward), done=bool(_terminated or _truncated))
                 _image = save_episode_image(_env, _out / f"step_{_step:02d}.png")
                 _record["image"] = str(_image)
+                _save_progress()
                 mo.output.append(step_card(_record))
         _episode["status"] = "environment done" if _terminated or _truncated else "step budget reached"
     except KeyboardInterrupt:
@@ -341,8 +388,7 @@ def episode_loop(
                 _env.close()
             except Exception as _close_error:
                 _episode["cleanup_error"] = f"{type(_close_error).__name__}: {_close_error}"
-        _episode["elapsed"] = round(time.monotonic() - _started, 1)
-        (_out / "episode.json").write_text(json.dumps(_episode, indent=2), encoding="utf-8")
+        _save_progress()
         set_episodes(lambda previous: [*previous, _episode])
 
     mo.output.replace(mo.callout(
@@ -353,26 +399,33 @@ def episode_loop(
 
 
 @app.cell(hide_code=True)
-def episode_selector(get_episodes, mo):
+def episode_selector(comparison_row, get_episodes, mo):
     _runs = get_episodes()
     _options = {
-        f"{_i + 1} · {_r['module']} · {_r['model']} · {_r['elapsed']}s": _r["id"]
+        f"{_i + 1} · {_r['model']} · {_r['module']} × {_r.get('signature', 'Baseline')}": _r["id"]
         for _i, _r in enumerate(_runs)
     } or {"No episodes yet": None}
     review_episode = mo.ui.dropdown(
         _options, value=list(_options)[-1], disabled=not _runs,
         label="Review episode", full_width=True,
     )
-    _summary = [mo.md("## Compare episodes")]
+    _summary = [mo.md("## Compare model × harness")]
     if _runs:
-        _summary.append(mo.ui.table([
-            {"Episode": _i + 1, "Scenario": _r.get("scenario", "iron_ore_throughput"), "Module": _r["module"], "Model": _r["model"],
-             "Agent steps": sum(_s["index"] > 0 for _s in _r["steps"]),
-             "Seconds": _r["elapsed"], "Stop reason": _r["status"]}
-            for _i, _r in enumerate(_runs)
-        ], selection=None, show_column_summaries=False, show_data_types=False))
+        _summary.append(mo.ui.table(
+            [comparison_row(_r, _i + 1) for _i, _r in enumerate(_runs)],
+            selection=None, show_column_summaries=False, show_data_types=False,
+            hidden_columns=["Input tokens", "Output tokens", "Stop reason"],
+            freeze_columns_left=["Episode"],
+            format_mapping={
+                "Tokens": lambda value: "N/A" if value is None else f"{value:,}",
+                "Input tokens": lambda value: "N/A" if value is None else f"{value:,}",
+                "Output tokens": lambda value: "N/A" if value is None else f"{value:,}",
+                "Est. USD": lambda value: "N/A" if value is None else f"{value:.6f}",
+            },
+        ))
+        _summary.append(mo.md("- **Max score:** highest game reward reached, not the final reward.\n- **Tokens:** input + output, including reasoning; **USD:** available response-cost estimate.\n- **N/A** = unavailable (including older runs). Compare the **same scenario and budget**.\n- Episodes save automatically and reload offline. Download an **offline replay** below."))
     else:
-        _summary.append(mo.md("Your runs will appear here. Changing settings does not erase completed episodes."))
+        _summary.append(mo.md("Run episodes to compare model × module × signature."))
     _summary.append(review_episode)
     mo.vstack(_summary)
     return (review_episode,)
@@ -384,13 +437,15 @@ def episode_review(
     get_episodes,
     json,
     mo,
+    replay_html,
     review_episode,
     step_card,
     text_panel,
 ):
     mo.stop(review_episode.value is None)
     _selected = next(_r for _r in get_episodes() if _r["id"] == review_episode.value)
-    _review = [mo.md(f"**{_selected['module']} · {_selected['model']}**"), mo.plain_text(_selected["goal"])]
+    _review = [mo.md(f"**{_selected['model']} · {_selected['module']} × {_selected.get('signature', 'Baseline')}**"), mo.plain_text(_selected["goal"])]
+    _review.append(mo.accordion({"Usage and harness details": mo.json({"usage": _selected.get("usage"), "signature": _selected.get("signature", "Baseline"), "instructions": _selected.get("signature_instructions")})}))
     if _selected.get("error"):
         _review.append(mo.callout(text_panel(_selected["error"]), kind="danger"))
     if _selected.get("cleanup_error"):
@@ -400,6 +455,7 @@ def episode_review(
     _review.extend(step_card(_s) for _s in _selected["steps"])
     _review.extend([
         mo.md("**Check:** game response · reward · environment done. A rationale is not proof of success."),
+        mo.download(data=replay_html(_selected).encode("utf-8"), filename=f"{_selected['id']}_replay.html", label="Download offline replay · images included"),
         mo.download(data=json.dumps(_selected, indent=2).encode(), filename=f"{_selected['id']}.json", label="Download episode transcript"),
         mo.plain_text("Saved images and transcript: " + _selected["directory"]),
     ])

@@ -79,13 +79,43 @@ enabled. Changing controls alone does not start an episode.
 
 Requires the running Factorio cluster and provider credentials in `.env`.
 Fresh model requests bypass DSPy's cache. Images and JSON transcripts are saved
-under `.fle/renders/meetup/<episode>/`; the review picker keeps runs from the
-current notebook session. The displayed stop reason is not a success verdict.
+under `.fle/renders/meetup/<episode>/`; the review picker automatically reloads
+saved runs when the notebook opens. The displayed stop reason is not a success verdict.
 
 The walkthrough starts with the game loop, introduces the actual DSPy signature,
 then compares modules. Scenario goals come directly from FLE's registry; startup
 only inspects inventory and entities. Try iron ore, iron plates, gears, or circuits
 with the same agent. The episode table and saved transcripts record the scenario.
+
+Compare **model × harness**, where **harness = module × signature**:
+
+- **Baseline:** the original `FactorioProgrammer` contract.
+- **State-aware:** checks current state and returns an `expected_result` alongside
+  the program; works with both Predict and ChainOfThought.
+- Model options include `gpt-6-astra`, `gpt-5.6-sol`, and `gpt-5.6-luna`
+  ([official model IDs](https://developers.openai.com/api/docs/models)).
+- The comparison table shows **Max score** (peak game reward), input/output/total
+  tokens, and estimated USD from DSPy/LiteLLM response metadata when available.
+  Missing or incomplete usage/cost is left blank; older episodes are not assigned
+  invented usage. Recorded subtotals remain in the transcript's usage details.
+
+New transcripts preserve the signature name/instructions, per-step expected
+results and usage, and whole-episode accounting. Compare the same scenario and
+step budget; scores across different scenarios are not directly comparable.
+
+**Offline by default:** each step checkpoints `episode.json` and a standalone
+`replay.html` with embedded images and styles. Open the HTML directly in a browser
+without marimo, Factorio, API keys, or an internet connection. The notebook also
+offers **Download offline replay** and restores saved JSON episodes automatically.
+Existing recordings receive HTML replays when exported; missing old usage remains
+unavailable. Recordings are local and gitignored—copy the HTML to take it elsewhere.
+
+To review saved episodes interactively with installed dependencies, without
+dependency downloads:
+
+```bash
+uv run --offline marimo edit examples/04_dspy_agent_notebook.py
+```
 
 | Script | Purpose |
 |--------|---------|
