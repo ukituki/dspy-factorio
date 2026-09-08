@@ -134,3 +134,17 @@ input were checked to leave the completed-episode history intact.
   reported running with the game and RCON ports published.
 - This pass inspected code, documentation, and local artifact metadata. It did
   not run an LLM rollout, verify RCON authentication, or measure demo latency.
+
+## Scenario and metric controls
+
+- Difficulty labels follow the recipe-depth curriculum in [TASKS_GUIDE](TASKS_GUIDE.md)
+  and [AI_OPTIMIZATION](AI_OPTIMIZATION.md): mining → smelting → assembly → science.
+  They are suggested presentation tiers, not benchmark results.
+- Agent steps: **1–256**, default **4**. Each scenario shows a suggested longer-run
+  budget (16–256); the documented standard horizon is 64 programs.
+- **Baseline** uses the exact `FactorioProgrammer` signature used by example 04.
+- **Final score** is the last measured game reward; **Max score** is the peak.
+- **Success?** comes from the environment task verifier. A timeout or step limit
+  does not establish success. Old recordings without verification show **Unknown**.
+- New recordings persist final/max scores and task success alongside tokens,
+  estimated costs, programs, and images. Offline replays show the same metrics.

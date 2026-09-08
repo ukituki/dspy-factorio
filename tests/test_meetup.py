@@ -3,11 +3,30 @@ import unittest
 import dspy
 from dspy.utils import DummyLM
 
-from dspy_factorio.agent import AgentConfig, build_lm
-from dspy_factorio.meetup import SIGNATURES, build_harness, comparison_row, peak_score, summarize_usage
+from dspy_factorio.agent import AgentConfig, build_lm, build_agent, FactorioProgrammer
+from dspy_factorio.meetup import SIGNATURES, build_harness, comparison_row, peak_score, summarize_usage, final_score, episode_success, task_success, scenario_guidance
 
 
 class MeetupTests(unittest.TestCase):
+    def test_baseline_is_example_four_signature(self):
+        self.assertIs(SIGNATURES["Baseline"], FactorioProgrammer)
+        self.assertIs(build_harness("Predict", "Baseline").signature, build_agent().signature)
+
+    def test_success_requires_verification_not_done(self):
+        self.assertIsNone(episode_success([{"done": True, "truncated": True}]))
+        self.assertIs(task_success({"task_verification": {"success": 0}}), False)
+        self.assertIs(task_success({"task_verification": {"success": 1}}), True)
+        self.assertIsNone(task_success({}))
+        self.assertIsNone(task_success({"task_verification": {"success": "false"}}))
+        self.assertIs(episode_success([{"task_success": False}, {"task_success": True}]), True)
+        self.assertIs(episode_success([{"task_success": False}]), False)
+        self.assertIsNone(final_score([]))
+
+    def test_curriculum_horizons_increase(self):
+        self.assertEqual(scenario_guidance("iron_ore_throughput")[0], "Easy")
+        self.assertEqual(scenario_guidance("utility_science_pack_throughput")[1], 256)
+        self.assertEqual(scenario_guidance("future_task")[0], "Unrated")
+
     def test_requested_models_use_completion_token_parameter(self):
         for model in ("gpt-6-astra", "gpt-5.6-sol", "gpt-5.6-luna"):
             lm = build_lm(AgentConfig(model=f"openai/{model}"))
@@ -71,6 +90,8 @@ class MeetupTests(unittest.TestCase):
                              {"index": 2, "reward": 2}, {"index": 3, "reward": None}]}
         row = comparison_row(episode, 1)
         self.assertEqual(row["Max score"], 15)
+        self.assertEqual(row["Final score"], 2)
+        self.assertEqual(row["Success?"], "Unknown")
         self.assertEqual(row["Harness"], "Predict × Baseline")
         self.assertIsNone(row["Tokens"])
         self.assertIsNone(row["Est. USD"])

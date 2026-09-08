@@ -121,6 +121,42 @@ def peak_score(steps: Sequence[Mapping[str, Any]]) -> float | None:
     return max(scores) if scores else None
 
 
+
+def final_score(steps: Sequence[Mapping[str, Any]]) -> float | None:
+    """Last measured reward; pending actions have no measurement."""
+    return next((step["reward"] for step in reversed(steps) if _number(step.get("reward"))), None)
+
+
+def episode_success(steps: Sequence[Mapping[str, Any]]) -> bool | None:
+    """Use explicit task verification; legacy done flags are ambiguous."""
+    results = [step.get("task_success") for step in steps if isinstance(step.get("task_success"), bool)]
+    return any(results) if results else None
+
+
+def task_success(observation: Mapping[str, Any]) -> bool | None:
+    verification = observation.get("task_verification")
+    value = verification.get("success") if isinstance(verification, Mapping) else None
+    return bool(value) if isinstance(value, (bool, int)) and value in (0, 1) else None
+
+
+def scenario_guidance(scenario: str) -> tuple[str, int, str]:
+    """Suggested tiers from TASKS_GUIDE recipe depth and AI_OPTIMIZATION curriculum.
+
+    These are presentation guidance, not measured benchmark difficulty.
+    """
+    product = scenario.split("_throughput")[0]
+    if product == "iron_ore":
+        return "Easy", 16, "Mining only"
+    if product in {"iron_plate", "steel_plate", "stone_wall"}:
+        return "Medium", 32, "Mining → smelting"
+    if product in {"iron_gear_wheel", "electronic_circuit", "inserter", "automation_science_pack"}:
+        return "Medium", 64, "Smelting → assembly"
+    if product in {"processing_unit", "low_density_structure", "production_science_pack", "utility_science_pack", "chemical_science_pack"}:
+        return "Expert", 256, "Deep recipe chains + multiple production lines"
+    if product in {"crude_oil", "petroleum_gas", "plastic_bar", "sulfur", "sufuric_acid", "sulfuric_acid", "battery", "advanced_circuit", "engine_unit", "logistics_science_pack", "military_science_pack", "piercing_round"}:
+        return "Hard", 128, "Multiple production stages and/or fluid handling"
+    return "Unrated", 64, "Default task horizon"
+
 def comparison_row(episode: Mapping[str, Any], index: int) -> dict[str, Any]:
     """Keep legacy episodes reviewable without inventing token/cost data."""
     usage = episode.get("usage") or {}
@@ -131,7 +167,9 @@ def comparison_row(episode: Mapping[str, Any], index: int) -> dict[str, Any]:
         "Scenario": episode.get("scenario", "iron_ore_throughput"),
         "Model": episode["model"],
         "Harness": f"{episode['module']} × {signature}",
+        "Final score": final_score(episode["steps"]),
         "Max score": peak_score(episode["steps"]),
+        "Success?": {True: "Yes", False: "No", None: "Unknown"}[episode_success(episode["steps"])],
         "Input tokens": usage.get("input_tokens"),
         "Output tokens": usage.get("output_tokens"),
         "Tokens": usage.get("total_tokens"),

@@ -49,15 +49,19 @@ def imports():
 
 @app.cell(hide_code=True)
 def harness_support():
-    from dspy_factorio.meetup import MODEL_OPTIONS, SIGNATURES, build_harness, comparison_row, peak_score, summarize_usage
+    from dspy_factorio.meetup import MODEL_OPTIONS, SIGNATURES, build_harness, comparison_row, peak_score, summarize_usage, final_score, episode_success, task_success, scenario_guidance
 
     return (
         MODEL_OPTIONS,
         SIGNATURES,
         build_harness,
         comparison_row,
+        episode_success,
+        final_score,
         peak_score,
+        scenario_guidance,
         summarize_usage,
+        task_success,
     )
 
 
@@ -128,7 +132,7 @@ def module_factory(build_harness, dspy, mo):
     agent = dspy.ChainOfThought(signature)
     ```
 
-    - **Baseline:** original program-generation contract.
+    - **Baseline:** exact `FactorioProgrammer` signature from example 04.
     - **State-aware:** fresh state checks + an `expected_result` to verify.
     - **ChainOfThought:** adds a written rationale to either signature.
     """)
@@ -136,7 +140,7 @@ def module_factory(build_harness, dspy, mo):
 
 
 @app.cell(hide_code=True)
-def scenario_catalog_cell(get_environment_info):
+def scenario_catalog_cell(get_environment_info, scenario_guidance):
     from dspy_factorio.env import list_envs
 
     scenario_catalog = {
@@ -146,7 +150,7 @@ def scenario_catalog_cell(get_environment_info):
     }
     _preferred = ["iron_ore_throughput", "iron_plate_throughput", "iron_gear_wheel_throughput", "electronic_circuit_throughput"]
     scenario_options = {
-        name.replace("_throughput", "").replace("_", " ").capitalize(): name
+        name.replace("_throughput", "").replace("_", " ").capitalize() + " · " + scenario_guidance(name)[0]: name
         for name in [*_preferred, *sorted(set(scenario_catalog) - set(_preferred))]
         if name in scenario_catalog
     }
@@ -162,8 +166,8 @@ def controls(MODEL_OPTIONS, SIGNATURES, mo, scenario_options):
     custom_model = mo.ui.text(placeholder="provider/model", label="Custom model ID", full_width=True)
     module_picker = mo.ui.dropdown(["Predict", "ChainOfThought"], value="Predict", label="DSPy module")
     signature_picker = mo.ui.dropdown(list(SIGNATURES), value="Baseline", label="Signature", full_width=True)
-    scenario_picker = mo.ui.dropdown(scenario_options, value="Iron ore", searchable=True, label="Scenario", full_width=True)
-    step_budget = mo.ui.slider(1, 10, value=4, step=1, label="Agent steps", show_value=True)
+    scenario_picker = mo.ui.dropdown(scenario_options, value="Iron ore · Easy", searchable=True, label="Scenario", full_width=True)
+    step_budget = mo.ui.number(start=1, stop=256, value=4, step=1, label="Agent steps · 1–256")
     run_episode = mo.ui.run_button(label="Run new episode · reset game", kind="success", full_width=True)
     mo.vstack([
         mo.md("## Change the task, keep the program"),
@@ -187,7 +191,7 @@ def controls(MODEL_OPTIONS, SIGNATURES, mo, scenario_options):
 
 
 @app.cell(hide_code=True)
-def task(mo, scenario_catalog, scenario_picker):
+def task(mo, scenario_catalog, scenario_guidance, scenario_picker):
     env_id = scenario_picker.value
     environment_description = scenario_catalog[env_id]["description"]
     bootstrap = "print(inspect_inventory())\nprint(get_entities())"
@@ -201,8 +205,9 @@ def task(mo, scenario_catalog, scenario_picker):
     )
     mo.vstack([
         mo.md("**Selected goal**"),
+        mo.md(f"**{scenario_guidance(env_id)[0]}** · {scenario_guidance(env_id)[2]} · Try **{scenario_guidance(env_id)[1]} steps** for a longer run."),
         mo.plain_text(environment_description),
-        mo.md("- Goal and scoring come from the scenario registry.\n- Same signature, module, and loop for every scenario.\n- Startup only inspects inventory and entities; the model chooses what to build."),
+        mo.md("- Difficulty: suggested from docs’ recipe depth; not a benchmark rating.\n- Goal and scoring come from the scenario registry.\n- Same signature, module, and loop for every scenario.\n- Startup only inspects inventory and entities; the model chooses what to build."),
     ])
     return bootstrap, env_id, environment_description, scenario_api_hint
 
@@ -236,7 +241,7 @@ def render_helpers(Path, html, mo):
             details.extend([mo.md("**Generated program**" if record["index"] > 0 else "**Scripted bootstrap**"), text_panel(record["program"])])
         details.extend([mo.md("**Game response**"), text_panel(record["observation"])])
         if record.get("reward") is not None:
-            details.append(mo.md(f"Reward: **{record['reward']}** · Environment done: **{record['done']}**"))
+            details.append(mo.md(f"Reward: **{record['reward']}** · Task success: **{record.get('task_success', 'Unknown')}**"))
         if record.get("image"):
             return mo.hstack([
                 mo.vstack(details),
@@ -278,6 +283,8 @@ def episode_loop(
     dspy,
     env_id,
     environment_description,
+    episode_success,
+    final_score,
     make_demo_agent,
     make_env,
     mo,
@@ -298,6 +305,7 @@ def episode_loop(
     step_code,
     strip_code_fences,
     summarize_usage,
+    task_success,
     text_panel,
     time,
     uuid4,
@@ -324,6 +332,8 @@ def episode_loop(
     def _save_progress():
         _episode["usage"] = summarize_usage(_lm.history if _lm is not None else [], incomplete=_call_pending)
         _episode["max_score"] = peak_score(_episode["steps"])
+        _episode["final_score"] = final_score(_episode["steps"])
+        _episode["success"] = episode_success(_episode["steps"])
         _episode["elapsed"] = round(time.monotonic() - _started, 1)
         save_episode(_episode)
 
@@ -342,7 +352,8 @@ def episode_loop(
         _image = save_episode_image(_env, _out / "step_00.png", follow_factory=False)
         _record = {"index": 0, "label": "Bootstrap · inventory and existing machines", "program": bootstrap,
                    "reasoning": "", "observation": _observation, "image": str(_image),
-                   "reward": float(_reward), "done": bool(_terminated or _truncated)}
+                   "reward": float(_reward), "done": bool(_terminated or _truncated),
+                   "terminated": bool(_terminated), "truncated": bool(_truncated), "task_success": task_success(_obs)}
         _episode["steps"].append(_record)
         _save_progress()
         mo.output.append(step_card(_record))
@@ -370,7 +381,8 @@ def episode_loop(
                 mo.output.append(text_panel(_program))
                 _obs, _reward, _terminated, _truncated, _ = step_code(_env, _program)
                 _observation = obs_text(_obs) or "(empty observation)"
-                _record.update(observation=_observation, reward=float(_reward), done=bool(_terminated or _truncated))
+                _record.update(observation=_observation, reward=float(_reward), done=bool(_terminated or _truncated),
+                               terminated=bool(_terminated), truncated=bool(_truncated), task_success=task_success(_obs))
                 _image = save_episode_image(_env, _out / f"step_{_step:02d}.png")
                 _record["image"] = str(_image)
                 _save_progress()
@@ -423,7 +435,7 @@ def episode_selector(comparison_row, get_episodes, mo):
                 "Est. USD": lambda value: "N/A" if value is None else f"{value:.6f}",
             },
         ))
-        _summary.append(mo.md("- **Max score:** highest game reward reached, not the final reward.\n- **Tokens:** input + output, including reasoning; **USD:** available response-cost estimate.\n- **N/A** = unavailable (including older runs). Compare the **same scenario and budget**.\n- Episodes save automatically and reload offline. Download an **offline replay** below."))
+        _summary.append(mo.md("- **Final score:** last measured reward. **Max:** highest reward reached.\n- **Success?** Game task verifier; **Unknown** when verification was not recorded.\n- **Tokens:** input + output, including reasoning; **USD:** available response-cost estimate.\n- **N/A** = unavailable (including older runs). Compare the **same scenario and budget**.\n- Episodes save automatically and reload offline. Download an **offline replay** below."))
     else:
         _summary.append(mo.md("Run episodes to compare model × module × signature."))
     _summary.append(review_episode)
@@ -454,7 +466,7 @@ def episode_review(
         _review.append(mo.accordion({"Reset map": mo.image(Path(_selected["reset_image"]), width=600)}))
     _review.extend(step_card(_s) for _s in _selected["steps"])
     _review.extend([
-        mo.md("**Check:** game response · reward · environment done. A rationale is not proof of success."),
+        mo.md("**Check:** game response · reward · task success. A rationale is not proof of success."),
         mo.download(data=replay_html(_selected).encode("utf-8"), filename=f"{_selected['id']}_replay.html", label="Download offline replay · images included"),
         mo.download(data=json.dumps(_selected, indent=2).encode(), filename=f"{_selected['id']}.json", label="Download episode transcript"),
         mo.plain_text("Saved images and transcript: " + _selected["directory"]),
