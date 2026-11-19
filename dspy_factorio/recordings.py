@@ -39,6 +39,15 @@ def replay_html(episode: dict[str, Any]) -> str:
         ):
             if step.get(key):
                 blocks.append(f"<h3>{title}</h3><pre>{escape(str(step[key]))}</pre>")
+        decision = step.get("decision")
+        if decision:
+            outcome = decision["result"]
+            blocks.append(
+                "<h3>Typed action outcome</h3><p>"
+                + escape(f"{outcome['status']} · {outcome['fle_steps']} scored FLE step")
+                + "</p><details><summary>Candidates, selection and state transition</summary><pre>"
+                + escape(json.dumps(decision, indent=2)) + "</pre></details>"
+            )
         cards.append(
             f"<section><h2>{escape(step['label'])}</h2><p>Reward: {escape(str(step.get('reward')))}"
             f" · Environment done: {escape(str(step.get('done')))}</p><div class='step'><div>"

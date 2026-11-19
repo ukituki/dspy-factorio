@@ -235,6 +235,8 @@ def render_helpers(Path, html, mo):
         details = [mo.md(f"**{record['label']}**")]
         if record.get("reasoning"):
             details.extend([mo.md("**Model rationale · ChainOfThought**"), text_panel(record["reasoning"])])
+        if record.get("decision"):
+            details.append(mo.accordion({"Typed candidates and state transition": mo.json(record["decision"])}))
         if record.get("expected_result"):
             details.extend([mo.md("**Expected result · check against the game**"), text_panel(record["expected_result"])])
         if record.get("program"):

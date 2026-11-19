@@ -1,0 +1,210 @@
+[
+  {
+    "view": {
+      "episode_id": "lab-reset",
+      "version": 0,
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "inventory": {
+        "wooden-chest": 10,
+        "storage-tank": 10,
+        "transport-belt": 500,
+        "underground-belt": 100,
+        "burner-inserter": 50,
+        "inserter": 50,
+        "medium-electric-pole": 500,
+        "pipe": 500,
+        "pipe-to-ground": 100,
+        "boiler": 2,
+        "steam-engine": 2,
+        "burner-mining-drill": 50,
+        "electric-mining-drill": 50,
+        "offshore-pump": 2,
+        "pumpjack": 10,
+        "stone-furnace": 10,
+        "electric-furnace": 10,
+        "assembling-machine-2": 10,
+        "oil-refinery": 5,
+        "chemical-plant": 5,
+        "coal": 500
+      },
+      "entities": [],
+      "iron": null,
+      "throughput": null,
+      "task_success": null
+    },
+    "milestone_candidates": [
+      {
+        "id": "lab-reset:0:f49891dd7007b776",
+        "action": {
+          "kind": "scout_iron",
+          "target": null,
+          "entity": null,
+          "direction": "north",
+          "quantity": 0
+        },
+        "expected": "Observe the nearest iron ore"
+      }
+    ]
+  },
+  {
+    "view": {
+      "episode_id": "lab-reset",
+      "version": 3,
+      "position": {
+        "x": 15.5,
+        "y": 70.5
+      },
+      "inventory": {
+        "wooden-chest": 10,
+        "storage-tank": 10,
+        "transport-belt": 500,
+        "underground-belt": 100,
+        "burner-inserter": 50,
+        "inserter": 50,
+        "medium-electric-pole": 500,
+        "pipe": 500,
+        "pipe-to-ground": 100,
+        "boiler": 2,
+        "steam-engine": 2,
+        "burner-mining-drill": 49,
+        "electric-mining-drill": 50,
+        "offshore-pump": 2,
+        "pumpjack": 10,
+        "stone-furnace": 10,
+        "electric-furnace": 10,
+        "assembling-machine-2": 10,
+        "oil-refinery": 5,
+        "chemical-plant": 5,
+        "coal": 500
+      },
+      "entities": [
+        {
+          "ref": "burner-mining-drill@16,71",
+          "name": "burner-mining-drill",
+          "position": {
+            "x": 16.0,
+            "y": 71.0
+          },
+          "width": 2.0,
+          "height": 2.0,
+          "status": "no_fuel",
+          "drop": {
+            "x": 15.5,
+            "y": 69.5
+          },
+          "fuel": 0,
+          "contents": null,
+          "resources": [
+            "iron-ore"
+          ]
+        }
+      ],
+      "iron": {
+        "x": 15.5,
+        "y": 70.5
+      },
+      "throughput": 0.0,
+      "task_success": false
+    },
+    "milestone_candidates": [
+      {
+        "id": "lab-reset:3:9095c7c4f37b649b",
+        "action": {
+          "kind": "fuel_drill",
+          "target": null,
+          "entity": "burner-mining-drill@16,71",
+          "direction": "north",
+          "quantity": 20
+        },
+        "expected": "Drill has fuel or is working"
+      },
+      {
+        "id": "lab-reset:3:fdc647edc9e6450a",
+        "action": {
+          "kind": "place_drill",
+          "target": {
+            "x": 18.0,
+            "y": 71.0
+          },
+          "entity": null,
+          "direction": "north",
+          "quantity": 0
+        },
+        "expected": "Place a burner drill that covers iron"
+      },
+      {
+        "id": "lab-reset:3:3cf04b7285e01c9e",
+        "action": {
+          "kind": "place_drill",
+          "target": {
+            "x": 18.0,
+            "y": 71.0
+          },
+          "entity": null,
+          "direction": "east",
+          "quantity": 0
+        },
+        "expected": "Place a burner drill that covers iron"
+      },
+      {
+        "id": "lab-reset:3:e387ed8ca9ac7464",
+        "action": {
+          "kind": "place_drill",
+          "target": {
+            "x": 18.0,
+            "y": 71.0
+          },
+          "entity": null,
+          "direction": "south",
+          "quantity": 0
+        },
+        "expected": "Place a burner drill that covers iron"
+      },
+      {
+        "id": "lab-reset:3:e2b06c63a792f8fc",
+        "action": {
+          "kind": "place_drill",
+          "target": {
+            "x": 14.0,
+            "y": 71.0
+          },
+          "entity": null,
+          "direction": "north",
+          "quantity": 0
+        },
+        "expected": "Place a burner drill that covers iron"
+      },
+      {
+        "id": "lab-reset:3:74481aeb83e88d00",
+        "action": {
+          "kind": "place_drill",
+          "target": {
+            "x": 14.0,
+            "y": 71.0
+          },
+          "entity": null,
+          "direction": "south",
+          "quantity": 0
+        },
+        "expected": "Place a burner drill that covers iron"
+      },
+      {
+        "id": "lab-reset:3:e3e643d720922d13",
+        "action": {
+          "kind": "place_drill",
+          "target": {
+            "x": 14.0,
+            "y": 71.0
+          },
+          "entity": null,
+          "direction": "west",
+          "quantity": 0
+        },
+        "expected": "Place a burner drill that covers iron"
+      }
+    ]
+  }
+]
