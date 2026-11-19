@@ -709,7 +709,13 @@ dependencies = [
     { name = "dspy" },
     { name = "factorio-learning-environment", extra = ["eval"] },
     { name = "marimo" },
+    { name = "pydantic" },
     { name = "python-dotenv" },
+]
+
+[package.optional-dependencies]
+jev = [
+    { name = "typesafe-sdk" },
 ]
 
 [package.metadata]
@@ -718,8 +724,11 @@ requires-dist = [
     { name = "dspy", specifier = ">=3.3.0" },
     { name = "factorio-learning-environment", extras = ["eval"], specifier = ">=0.4.3" },
     { name = "marimo", specifier = ">=0.24.0" },
+    { name = "pydantic", specifier = ">=2,<3" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
+    { name = "typesafe-sdk", marker = "extra == 'jev'", specifier = ">=0.7.5,<0.8" },
 ]
+provides-extras = ["jev"]
 
 [[package]]
 name = "factorio-learning-environment"
@@ -3416,6 +3425,25 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ae/40/4a3db7990d1f62a53182aa96eaef57aeb2886a27f90a195bc66713565d31/typer-0.27.1.tar.gz", hash = "sha256:a79bef8469a79c45498e7b814ecf8d603cc7644e9acbd9e19cac0334240b18df", size = 203994 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/43/89/9518bc0c3929bee36b3a4a8e3daddd6e03f92f9961c66d4983b837160543/typer-0.27.1-py3-none-any.whl", hash = "sha256:53150287edd11baeb4e4722c8e394fcdf8181c0ae89485cba8d25c778d5edd56", size = 122874 },
+]
+
+[[package]]
+name = "typesafe-sdk"
+version = "0.7.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "httpx2" },
+    { name = "packaging" },
+    { name = "pydantic" },
+    { name = "pydantic-core" },
+    { name = "tenacity" },
+    { name = "truststore", marker = "sys_platform != 'emscripten'" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/26/4d/383aa14f4cfe5fb41023ea1cab52d7f79cc31ab200ee7314317cf89db744/typesafe_sdk-0.7.5.tar.gz", hash = "sha256:1eeeb0dc80a7161d84896db42a5016dc0a7c8872fa16540b70163e5357b6d398", size = 34152 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1c/f6/bee4c3b49570c2d312057c9e37c1446cf37eb1b86bf5872f7a797e803326/typesafe_sdk-0.7.5-py3-none-any.whl", hash = "sha256:967a8b61494d536abb55ee3f3a2b10e81685cb6baad6ccdcab588bdc6c9b86d2", size = 49948 },
 ]
 
 [[package]]

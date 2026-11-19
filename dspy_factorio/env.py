@@ -74,10 +74,11 @@ def step_code(
     *,
     agent_idx: int = 0,
     game_state: GameState | None = None,
+    capture_state: bool = True,
 ) -> tuple[dict[str, Any], float, bool, bool, dict[str, Any]]:
     """Execute one Python program against the live Factorio instance."""
     inner = env.unwrapped
-    if game_state is None:
+    if game_state is None and capture_state:
         game_state = GameState.from_instance(inner.instance)
     action = Action(code=code, agent_idx=agent_idx, game_state=game_state)
     return env.step(action)

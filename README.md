@@ -23,6 +23,11 @@ FLE / Factorio  ←── programs / tools ──  DSPy modules
 
 Same early milestone across advanced paths: **place and fuel one burner mining drill**.
 
+## Typed iron-ore agent
+
+Run a verified iron-ore rollout, compare DSPy and Jev policies, or export decision
+traces for calibration. See [the typed agent guide](docs/TYPED_IRON_AGENT.md).
+
 ## Quick start
 
 ```bash
